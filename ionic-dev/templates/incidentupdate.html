@@ -1,0 +1,137 @@
+<ion-view view-title="Incident Update" data-ng-init="init()"  >
+<ion-content padding="true" scroll="true" style="background-color: #607D8B;">
+	<form name="incUpdateform" ng-submit="updateTicket(incUpdateform)">
+  	<div class="list list-inset">
+  		<div class="item item-avatar item-icon-right">
+    		<img src="img/incident.png">
+    		<h3>Incident Number</h3>
+    		<p>{{ticketData.ticketNumber}}</p>
+    		<i class="icon ion-android-more-horizontal" ng-click = "openPopover($event, ticketData)"></i>
+    	</div>
+    	 <div class="item ">
+    			<p>
+    			<i class = "icon icon ion-person"></i>
+      			<a href="#" class="subdued">Created by:</a> <a>{{ticketData.raisedBy}}</a>
+      		</p>
+      		<p>
+      			<i class = "icon ion-calendar"></i>
+     			<a href="#" class="subdued">Created On:</a> <a>{{ticketData.raisedOn}}</a>
+    		</p>
+      		<p>
+      			<i class = "icon ion-calendar assertive"></i>
+     			<a href="#" class="subdued assertive">SLA due date:</a> <a>{{ticketData.sla}}</a>
+    		</p>
+      		<p>
+      			<i class = "icon ion-calendar"></i>
+     			<a href="#" class="subdued">Issue Start Time:</a> <a>{{ticketData.ticketStartTime}}</a>
+    		</p>
+    		<p>
+    		    <i class = "icon icon ion-person"></i>
+      			<a href="#" class="subdued">Assigned to:</a> <a>{{ticketData.assignedSP}}</a>
+      		</p>
+      	</div>
+     <!--  	<div class="item">
+      		<div class="row" >
+  				<div class="col" style="height:2px;">
+  					<i class = "icon ion-android-attach"></i>
+      				<a href="#" class="subdued">Attachment</a>
+  				</div>
+  				<div class="col" style="height:2px;">
+  					<i class = "icon ion-compose"></i>
+  					<a  class="subdued" ng-click="openIncidentWorkNote()">Work notes</a>
+  				</div>
+			</div>
+      	</div> -->
+  	</div>
+    <div class="list list-inset">
+	  <a class="item">
+	    SLA%
+	    <span class="badge badge-assertive">{{ticketData.slaPercent}}</span>
+	  </a>
+	  <div class="item item-button-right item-text-wrap">
+	    Site Name
+	    <p>{{ticketData.siteName}}</p>
+	    <button class="button button-clear button-positive">
+	      View
+	    </button>
+	  </div>
+	  <div class="item item-button-right item-text-wrap">
+	    Asset Name
+	    <p>{{ticketData.assetName}}</p>
+		<button class="button button-clear button-positive">
+	      View
+	    </button>
+	  </div>
+	</div>
+	<div class="list list-inset">
+		<div class="item item-divider">
+			Ticket Primary Details
+		</div>
+
+		<div class="item item-button-right item-text-wrap">
+	     Title
+	  	<input type="text" placeholder="Title" class="form-control" ng-model="ticketData.ticketTitle" required>
+	  </div>
+		<div class="item item-button-right item-text-wrap">
+	     Description
+	  	<input type="text" placeholder="Description" ng-model="ticketData.description" class="form-control" required>
+	  </div>
+		<div class="item item-button-right item-text-wrap">
+	     Category
+	  	 <select name="ticketCategorySelect" id="ticketCategorySelect" class="form-control"
+			onchange="getSelectedCategory('ticketCategorySelect')" required>
+		</select>
+		<input type="hidden" ng-model="selectedCategory.selected" >
+	  </div>
+	  <div class="item item-button-right item-text-wrap">
+	     Priority
+	  	<select name="prioritySelect" id="prioritySelect"  required disabled="disabled" class="form-control"
+			onchange="getSelectedPriority('prioritySelect')">
+				
+		</select>
+		<input type="hidden" ng-model="selectedPriority.priority" >
+	  </div>
+	  <div class="item item-button-right item-text-wrap">
+	     Status
+	  	<select name="statusSelect" id="statusSelect"  required class="form-control">
+            <option value = "0" label = "Select status"></option>
+            <option ng-repeat="status in TicketStatusList" value="{{status.Id}}">
+                {{status.Name}}
+            </option>
+        	</select>
+			<input type="hidden" ng-model="selectedTicketStatus.selected">
+	  </div>
+		
+	</div>
+
+	<div class="padding">
+                <button type="submit" class="button button-block button-balanced" >
+                    Save
+                </button>
+          </div>
+
+		</form>
+  </ion-content>
+
+	<script id = "ticketUpdateTabPop" type = "text/ng-template">
+   <ion-popover-view fit style="height: 210px;width: 150px" >
+	  <ion-content>
+         <div class="list" ng-click="popover.hide()">
+            <a class="item" ng-click="openIncidentLink()" >
+              External Ticket
+            </a>
+            <a class="item" ng-click="openIncidentEscalation()" >
+              Escalation
+            </a> 
+			<a class="item" ng-click="openIncidentHistory()" >
+              Ticket History
+            </a> 
+			<a class="item" ng-click="openIncidentAttachment()" >
+              Attachment
+            </a>          
+          </div>
+      </ion-content>
+		
+   </ion-popover-view>
+</script>
+</ion-view>

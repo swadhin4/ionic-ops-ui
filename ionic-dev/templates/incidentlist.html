@@ -1,0 +1,46 @@
+
+<ion-view view-title="Incident List" data-ng-init="init()" >
+	<ion-content padding="true" scroll="true" style="background-color: #607D8B;">
+	  <div class="list list-inset">
+	  	<label class="item item-input">
+	    	<i class="icon ion-search placeholder-icon"></i>
+	    	<input type="text" placeholder="Search" ng-model="search">
+	  	</label>
+	</div>
+	<div class = "card list" >
+      <i class="item item-avatar item-icon-right item-text-wrap" href="#" 
+            ng-repeat="ticket in ticket.list | filter:search" href="#/incidentlist/{{ticket.ticketNumber}}">
+        <img src="img/incident.png">
+        <i class="icon ion-android-more-vertical" ng-click = "openPopover($event,ticket.ticketNumber,ticket.ticketId)"></i>
+        <h3>{{ticket.ticketNumber}}</h3>
+        <p align="left"> {{ticket.raisedOn}} </p>
+        <p> {{ticket.ticketTitle}}</p>
+         <p align="left"> {{ticket.status}} </p>
+         <p align="left">SLA: {{ticket.sla}} </p>
+      </i>
+    </div> 
+  </ion-content>
+  <div class="float-button">
+	<span class="height-fix">
+	  	<a class="content">
+	    	<i class="icon ion-ios-plus-empty"> </i>
+	   	</a>
+	  </span>
+</div>
+
+  <script id = "ticketViewEditPop" type = "text/ng-template">
+   <ion-popover-view fit style="height: 125px;width: 100px" >
+	  <ion-content>
+         <div class="list" ng-click="popover.hide()">
+            <a class="item" href="#/incidentview" >
+              View
+            </a>
+            <a class="item" ng-click="openIncidentUpdate()" >
+              Edit
+            </a>            
+          </div>
+      </ion-content>
+		
+   </ion-popover-view>
+</script>
+</ion-view>

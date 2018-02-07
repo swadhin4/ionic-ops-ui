@@ -109,7 +109,7 @@ public class OAuth2Configuration {
                     .authorities(Authorities.ROLE_SALES_MANAGER.name())
                     .authorizedGrantTypes("client_id","password", "refresh_token")
                     .secret(propertyResolver.getProperty(PROP_SECRET))
-                    .accessTokenValiditySeconds(propertyResolver.getProperty(PROP_TOKEN_VALIDITY_SECONDS, Integer.class, 1800));
+                    .accessTokenValiditySeconds(propertyResolver.getProperty(PROP_TOKEN_VALIDITY_SECONDS, Integer.class, 86400));
         }
 
         @Override

@@ -1,0 +1,42 @@
+<ion-view view-title="Ticket History" data-ng-init="init()">
+<ion-content padding="true" scroll="true" >
+  	<ul class="timeline">
+        <li ng-if="ticketHistoryDetail.history.length > 0">
+          <div class="timeline-item" ng-show="ticketHistoryDetail.ticketCloseDate != null ">            
+            <div class="timeline-stats">
+              <i class="ion-clock"></i> Closed On : {{ticketHistoryDetail.ticketCloseDate}}
+            </div>
+          </div>
+          <div class="timeline-item" ng-show="ticketHistoryDetail.ticketCloseDate == null ">            
+            <div class="timeline-stats">
+              <i class="ion-clock"></i> {{CurrentDate}}
+            </div>
+          </div>
+        </li>
+
+        <li ng-repeat="tktHistory in ticketHistoryDetail.history">
+          <div class="timeline-thumb bg-color-blue timeline-icon">
+            <i class="ion-person"></i>
+           
+          </div>
+          <div class="timeline-item item-text-wrap">
+            <p>{{tktHistory.description}} by {{tktHistory.name}}</p>
+            <div class="timeline-stats">
+              <i class="ion-clock"></i> {{tktHistory.date}}
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="timeline-thumb bg-color-blue timeline-icon">
+            <i class="ion-person"></i>
+          </div>
+          <div class="timeline-item">            
+            <div class="timeline-stats">
+              <i class="ion-clock"></i> Created On : {{ticketData.raisedOn}}
+            </div>
+          </div>
+        </li>
+        
+      </ul>
+  </ion-content>
+</ion-view>
