@@ -221,9 +221,16 @@ ops365App.factory("ticketService", ['$http', '$q',function ($http, $q) {
     }
 
         // implementation
- 	    function getTicketPriorityAndSLA(spId, categoryId) {
+ 	    function getTicketPriorityAndSLA(spId, categoryId,tokendata) {
  	        var def = $q.defer();
- 	        $http.get(hostLocation+"/incident/priority/sla/"+spId+"/"+categoryId)
+ 	       var config = {
+ 	                headers : {
+ 	                "Authorization": "Bearer "+tokendata.object.access_token,
+ 					"Accept" : "application/json",
+ 	                }
+ 	             
+ 			 };
+ 	        $http.get("http://localhost:9191/ops/api/incident/priority/sla/"+spId+"/"+categoryId, config)
  	            .success(function(data) {
  	            	console.log(data)
  	                def.resolve(data);
@@ -365,4 +372,54 @@ ops365App.factory("ticketEscalationService", ['$http', '$q',function ($http, $q)
             });
         return def.promise;
     }
+}]);
+
+ops365App.factory("siteService", ['$http', '$q',function ($http, $q) {
+	var SiteService = {
+		site:{},
+        siteList: [],
+        retrieveAllSites:retrieveAllSites,
+        retrieveSiteDetails:retrieveSiteDetails,
+    };
+	
+ 	return SiteService;
+ 	
+    function retrieveSiteDetails(siteId, tokendata) {
+        var def = $q.defer();
+        var config = {
+                headers : {
+                "Authorization": "Bearer "+tokendata.object.access_token,
+				"Accept" : "application/json",
+                }
+             
+		 };
+        $http.get("http://localhost:9191/ops/api/site/v1/selected/"+siteId, config)
+            .success(function(data) {
+                 console.log(data)
+                 SiteService.site=data;
+                def.resolve(data);
+            })
+            .error(function(data) {
+                 console.log(data)
+                def.reject(data);
+            });
+        return def.promise;
+    }
+
+ 	
+    // implementation
+    function retrieveAllSites() {
+        var def = $q.defer();
+        $http.get(hostLocation+"/test/api/sites")
+            .success(function(data) {
+            	console.log(data)
+                def.resolve(data);
+            })
+            .error(function(data) {
+            	console.log(data)
+                def.reject(data);
+            });
+        return def.promise;
+    }
+   
 }]);

@@ -1,6 +1,7 @@
-ops365App.controller('incidentupdateCtrl',['$rootScope', '$scope','$filter','$ionicPopover','$stateParams','$state',
-                                           'userService','ticketService','statusService','ticketCategoryService',
-	 function($rootScope,$scope,$filter,$ionicPopover,$stateParams,$state,userService,ticketService,statusService,ticketCategoryService) {
+ops365App.controller('incidentupdateCtrl',['$rootScope', '$scope','$filter','$ionicPopover','$ionicModal','$ionicPopup','$stateParams','$state',
+                                           'userService','ticketService','statusService','ticketCategoryService','siteService',
+                                           function($rootScope,$scope,$filter,$ionicPopover,$ionicModal,$ionicPopup,
+                                        $stateParams,$state,userService,ticketService,statusService,ticketCategoryService,siteService) {
 		 $scope.ticketData={};
 		$scope.categoryList=[];
 		//$scope.ticketData.ticketNumber = null;
@@ -8,7 +9,7 @@ ops365App.controller('incidentupdateCtrl',['$rootScope', '$scope','$filter','$io
 	 $scope.init=function(){
 		 console.log($stateParams.selectedticket);
 		 console.log($state.params.selectedticket);
-		 $scope.getTicketPriority();
+		// $scope.getTicketPriority();
 		 $scope.selectedCategory={};
 		 //$scope.ticketData.ticketNumber = "INC003489";
          //console.log("shibasish");
@@ -26,16 +27,15 @@ ops365App.controller('incidentupdateCtrl',['$rootScope', '$scope','$filter','$io
 	 }
 
 	 $scope.getSelectedTicket=function(selectedTicketNumber){
-		 console.log(selectedTicketNumber)
-		 
-		 var token=$scope.token;
-                ticketService.getSelectedTicket(selectedTicketNumber, token)
-                .then(function(data){
+		 	console.log(selectedTicketNumber)
+		 	var token=$scope.token;
+            ticketService.getSelectedTicket(selectedTicketNumber, token)
+            .then(function(data){
 				console.log("Ticket DetailsXXXX")
 				console.log(data)
 				if(data.statusCode == 200){
 					$scope.getStatus();
-					// $scope.getTicketPriority();
+					$scope.getTicketPriority();
 					$scope.ticketData=angular.copy(data.object);
 					$scope.getTicketCategory(token);
 					if($scope.ticketData.statusId == 6){
@@ -77,7 +77,7 @@ ops365App.controller('incidentupdateCtrl',['$rootScope', '$scope','$filter','$io
 			});
          }
 
-$scope.getTicketCategory=function(token){
+	 $scope.getTicketCategory=function(token){
 			//$('#loadingDiv').show();
 			ticketCategoryService.retrieveAllCategories(token)
 			.then(function(data) {
@@ -107,7 +107,11 @@ $scope.getTicketCategory=function(token){
 									return false;
 								}
 						 	});
+    						var catergorySelected={
+    								categoryId:$scope.ticketData.categoryId,
+    						}
     						$scope.selectedCategory.selected = $scope.ticketData.categoryName;
+    						$scope.setTicketPriorityAndSLA(catergorySelected, token);
     					}
     				}else{
     					console.log("No categories found")
@@ -140,31 +144,10 @@ $scope.getTicketCategory=function(token){
 				options.append($("<option />").val(	this.id).text(	this.code));
 			});
 		}
-	$scope.getSelectedCategory=function(){
-	if(dropDownId.toUpperCase() == "TICKETCATEGORYSELECT"){
-		 var category={
-				 categoryId:parseInt($("#ticketCategorySelect").val()),
-		 		 categoryName:$("#ticketCategorySelect option:selected").text()
-		 }
-		 $scope.categoryList.selected =category;
-		 //scope.getTicketPriority();
-		 scope.setTicketPriorityAndSLA($scope.categoryList.selected);
-	 }
-	}
 
-	$scope.getSelectedPriority=function(dropDownId){
-	//var scope = angular.element("#incidentWindow").scope();
-	if(dropDownId.toUpperCase() == "PRIORITYSELECT"){
-		 var priority={
-				 categoryId:parseInt($("#prioritySelect").val()),
-		 		 categoryName:$("#prioritySelect option:selected").text()
-		 }
-		 $scope.priorityList.selected =priority;
-	 }
-	}
-
-	$scope.setTicketPriorityAndSLA=function(ticketCategory){
+	$scope.setTicketPriorityAndSLA=function(ticketCategory, token){
 			 console.log($scope.ticketData);
+			 console.log(token);
 			 var spId = $scope.ticketData.sp;
 			 //if(viewMode.toUpperCase()=='EDIT'){
 				 spId=parseInt($scope.ticketData.assignedTo);
@@ -174,7 +157,7 @@ $scope.getTicketCategory=function(token){
 				 return false;
 			 }else{
 				// $('#loadingDiv').show();
-			 ticketService.getTicketPriorityAndSLA(spId,ticketCategory.categoryId)
+			 ticketService.getTicketPriorityAndSLA(spId,ticketCategory.categoryId, token)
 			 .then(function(data){
 				 console.log(data);
 				 if(data.statusCode == 200){
@@ -185,6 +168,7 @@ $scope.getTicketCategory=function(token){
 					 $scope.ticketData.unit= data.object.units;
 					 $scope.ticketData.duration = data.object.duration;
 					 $scope.ticketData.slaTime =  $scope.ticketData.duration + " " +  $scope.ticketData.unit;
+					 var viewMode="EDIT";
 					 if(viewMode.toUpperCase()=='EDIT'){
 						 $.each($scope.priorityList,function(key,val){
 							 if(val.priorityId == $scope.ticketData.priorityId){
@@ -203,7 +187,7 @@ $scope.getTicketCategory=function(token){
 			
 		 }
 
-		 $scope.getTicketPriority=function(){
+		 $scope.getTicketPriority=function(token){
 			$scope.priorityList=[{
 				'priorityId':1,
 				'priorityCode':'P1',
@@ -238,11 +222,31 @@ $scope.getTicketCategory=function(token){
 			var category={
 					categoryId:$scope.ticketData.categoryId
 			}
-			$scope.setTicketPriorityAndSLA(category);
+			//$scope.setTicketPriorityAndSLA(category, token);
 			
 		}
-	/*
-*/
+
+		//getselected ticketCategory
+		$scope.getDropdownInfo=function(component, event, dropDownId){
+				console.log(component);
+				var token =$scope.token;
+			if(dropDownId.toUpperCase() == "TICKETCATEGORYSELECT"){
+				 var category={
+						 categoryId:parseInt($("#ticketCategorySelect").val()),
+				 		 categoryName:$("#ticketCategorySelect option:selected").text()
+				 }
+				 $scope.categoryList.selected =category;
+				 $scope.setTicketPriorityAndSLA($scope.categoryList.selected, token);
+			 }
+			else if(dropDownId.toUpperCase() == "PRIORITYSELECT"){
+				 var priority={
+						 categoryId:parseInt($("#prioritySelect").val()),
+				 		 categoryName:$("#prioritySelect option:selected").text()
+				 }
+				 $scope.priorityList.selected =priority;
+			 }
+		}
+		 
 		 $scope.getStatus=function(){
 			 var token=$scope.token;
 				statusService.retrieveAllStatus(token)
@@ -308,4 +312,85 @@ $scope.getTicketCategory=function(token){
 	       $state.go('incidentlinkticket', { selectedticket: $scope.ticketData.ticketId }
 	      );
 	   }
+	   $scope.showAssetInfo=function(){
+	   		var alertPopup = $ionicPopup.alert({
+		      title: 'Dont eat that!',
+		      template: 'It might taste good'
+		    });
+		    alertPopup.then(function(res) {
+		      console.log('Thank you for not eating my delicious ice cream cone');
+		    });
+	   }
+	   
+	   $scope.showSiteInfo=function(){
+		   var token=$scope.token;
+		   var siteId = $scope.ticketData.siteId;
+		   $scope.getSelectedSiteData(siteId, token);
+	   }
+	   
+	   $scope.getSelectedSiteData=function(siteId, token){
+			 siteService.retrieveSiteDetails(siteId, token)
+	    		.then(function(data) {
+	    			console.log(data)
+	    			var site=angular.copy(data.object);
+	    			$scope.selectedSite={};
+					$scope.selectedSite=angular.copy(site);
+					$scope.selectedSite.siteName = site.siteName;
+					$scope.selectedSite.siteNumber1 = site.siteNumber1;
+					$scope.selectedSite.siteNumber2 = site.siteNumber2;
+					$scope.selectedSite.salesAreaSize = site.salesAreaSize;
+					$scope.selectedSite.siteAddress = site.fullAddress;
+					
+					$scope.selectedSite.siteAddress1 = site.siteAddress1;
+					$scope.selectedSite.siteAddress2 = site.siteAddress2;
+					$scope.selectedSite.siteAddress3 = site.siteAddress3;
+					$scope.selectedSite.siteAddress4 = site.siteAddress4;
+					
+					$scope.selectedSite.district = site.district;
+					$scope.selectedSite.area=site.area;
+					$scope.selectedSite.cluster=site.cluster;
+					
+					/*$scope.district.selected=$scope.selectedSite.district;
+					$scope.area.selected = $scope.selectedSite.area;
+					$scope.cluster.selected = $scope.selectedSite.cluster;*/
+					 
+					$scope.selectedSite.retailerName=site.owner;
+					$scope.selectedSite.primaryContact=site.primaryContact;
+					$scope.selectedSite.secondaryContact=site.secondaryContact;
+					
+					$scope.selectedSite.LicenseDetail = site.siteLicense;
+					$scope.selectedSite.SalesOperation = site.siteOperation;
+					$scope.selectedSite.DeliveryOperation = site.siteDelivery;
+					$scope.selectedSite.submeterDetails = site.siteSubmeter;
+					 
+					$scope.siteLicense = $scope.selectedSite.LicenseDetail;
+					$scope.siteSalesOperation = $scope.selectedSite.SalesOperation;
+					$scope.siteDeliveryOperation = $scope.selectedSite.DeliveryOperation;
+					
+					$scope.siteSubmeterDetails = $scope.selectedSite.submeterDetails;
+					//$scope.siteData.siteId = $scope.selectedSite.siteId;
+	    			//$scope.siteData = angular.copy( $scope.selectedSite);
+					console.log($scope.selectedSite.siteAttachments);
+					var customTemplate='<div class="item ">' 
+						+'<p><i class = "icon icon ion-person"></i>'
+						+'<a href="#" class="subdued"> Address :</a> <a>'+ $scope.selectedSite.siteAddress+'</a>'
+						+'</p><p><i class = "icon ion-android-phone-portrait"></i><a href="#" class="subdued"> Site Number 1:</a> <a>'+ $scope.selectedSite.siteNumber1+'</a>'
+						+'</p><p><i class = "icon ion-android-phone-portrait"></i><a href="#" class="subdued"> Primary Contact:</a> <a>'+ $scope.selectedSite.primaryContact+'</a>'
+						+'</p><p><i class = "icon ion-calendar"></i><a href="#" class="subdued"> Operator :</a> <a>'+ $scope.selectedSite.operator.companyName+'</a>'
+						+'</p><p><i class = "icon icon ion-person"></i><a href="#" class="subdued"> Retailer :</a> <a>'+ $scope.selectedSite.retailerName+'</a>'
+						+'</p><p><i class = "icon icon ion-android-mail"></i><a href="#" class="subdued"> Owner :</a> <a>'+ $scope.selectedSite.email+'</a>'
+						+'</p></div>';
+					var alertPopup = $ionicPopup.alert({
+					      title: $scope.selectedSite.siteName,
+					      template: customTemplate
+					 });
+					    alertPopup.then(function(res) {
+					    //console.log('Thank you for not eating my delicious ice cream cone');
+				    });
+	    		},function(data){
+	    			console.log(data);
+	    		});
+	    		
+		 }
+
      }]);

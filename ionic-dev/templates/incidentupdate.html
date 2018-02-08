@@ -51,15 +51,15 @@
 	  <div class="item item-button-right item-text-wrap">
 	    Site Name
 	    <p>{{ticketData.siteName}}</p>
-	    <button class="button button-clear button-positive">
-	      View
+	    <button class="button button-clear button-positive" ng-click="showSiteInfo()">
+	  	<i class="icon icon ion-information-circled"></i>
 	    </button>
 	  </div>
 	  <div class="item item-button-right item-text-wrap">
 	    Asset Name
 	    <p>{{ticketData.assetName}}</p>
-		<button class="button button-clear button-positive">
-	      View
+		<button class="button button-clear button-positive" ng-click="showAssetInfo()">
+	     <i class="icon icon ion-information-circled"></i>
 	    </button>
 	  </div>
 	</div>
@@ -74,19 +74,19 @@
 	  </div>
 		<div class="item item-button-right item-text-wrap">
 	     Description
-	  	<input type="text" placeholder="Description" ng-model="ticketData.description" class="form-control" required>
+	  	<textarea type="text" placeholder="Description" ng-model="ticketData.description" class="form-control" required></textarea>
 	  </div>
 		<div class="item item-button-right item-text-wrap">
 	     Category
 	  	 <select name="ticketCategorySelect" id="ticketCategorySelect" class="form-control"
-			onchange="getSelectedCategory('ticketCategorySelect')" required>
+			onchange="angular.element(this).scope().getDropdownInfo(this, event, 'ticketCategorySelect')" required>
 		</select>
 		<input type="hidden" ng-model="selectedCategory.selected" >
 	  </div>
 	  <div class="item item-button-right item-text-wrap">
 	     Priority
-	  	<select name="prioritySelect" id="prioritySelect"  required disabled="disabled" class="form-control"
-			onchange="getSelectedPriority('prioritySelect')">
+	  	<select name="prioritySelect" id="prioritySelect"  required  class="form-control"
+	  	onchange="angular.element(this).scope().getDropdownInfo(this, event, 'prioritySelect')">
 				
 		</select>
 		<input type="hidden" ng-model="selectedPriority.priority" >
