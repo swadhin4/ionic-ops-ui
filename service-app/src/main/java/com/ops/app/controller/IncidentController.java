@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import com.ops.app.vo.LoginUser;
 import com.ops.app.vo.TicketCommentVO;
 import com.ops.app.vo.TicketHistoryVO;
 import com.ops.app.vo.TicketMVO;
+import com.ops.app.vo.TicketPrioritySLAVO;
 import com.ops.app.vo.TicketVO;
 import com.ops.app.vo.UserVO;
 import com.ops.jpa.entities.Status;
@@ -250,6 +253,32 @@ public class IncidentController  {
 				responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.EXPECTATION_FAILED);
 			}
 			return responseEntity;
+	}
+	
+	@RequestMapping(value = "/priority/sla/{spId}/{categoryId}", method = RequestMethod.GET,produces="application/json")
+	public ResponseEntity<RestResponse> getPriorityAndSLA(@PathVariable(value="spId") Long spId, @PathVariable(value="categoryId") Long categoryId,
+			final HttpSession session) {
+		RestResponse response = new RestResponse();
+		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
+			try {
+				TicketPrioritySLAVO ticketPrioritySLAVO = ticketService.getTicketPriority(spId, categoryId);
+				if(ticketPrioritySLAVO.getPriorityId()!= null){
+					response.setStatusCode(200);
+					response.setObject(ticketPrioritySLAVO);
+					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
+				}else{
+					response.setStatusCode(204);
+					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND);
+				}
+
+			} catch (Exception e) {
+				logger.info("Exception in getting response", e);
+				response.setMessage("Exception while getting Priority");
+				response.setStatusCode(500);
+				responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND);
+
+			}
+		return responseEntity;
 	}
 	
 }

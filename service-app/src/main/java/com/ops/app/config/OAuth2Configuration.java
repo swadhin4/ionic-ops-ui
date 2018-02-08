@@ -109,6 +109,20 @@ public class OAuth2Configuration {
                     .authorities(Authorities.ROLE_SALES_MANAGER.name())
                     .authorizedGrantTypes("client_id","password", "refresh_token")
                     .secret(propertyResolver.getProperty(PROP_SECRET))
+                    .accessTokenValiditySeconds(propertyResolver.getProperty(PROP_TOKEN_VALIDITY_SECONDS, Integer.class, 86400))
+                 .and()
+                    .withClient(propertyResolver.getProperty(PROP_CLIENTID))
+                    .scopes("read", "write")
+                    .authorities(Authorities.ROLE_SITE_STAFF.name())
+                    .authorizedGrantTypes("client_id","password", "refresh_token")
+                    .secret(propertyResolver.getProperty(PROP_SECRET))
+                    .accessTokenValiditySeconds(propertyResolver.getProperty(PROP_TOKEN_VALIDITY_SECONDS, Integer.class, 86400))
+                  .and()
+                    .withClient(propertyResolver.getProperty(PROP_CLIENTID))
+                    .scopes("read", "write")
+                    .authorities(Authorities.ROLE_OPS_MANAGER.name())
+                    .authorizedGrantTypes("client_id","password", "refresh_token")
+                    .secret(propertyResolver.getProperty(PROP_SECRET))
                     .accessTokenValiditySeconds(propertyResolver.getProperty(PROP_TOKEN_VALIDITY_SECONDS, Integer.class, 86400));
         }
 
