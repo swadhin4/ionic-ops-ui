@@ -1,14 +1,24 @@
-ops365App.controller('incidentupdateCtrl',['$rootScope', '$scope','$filter','$ionicPopover','$ionicModal','$ionicPopup','$stateParams','$state',
-                                           'userService','ticketService','statusService','ticketCategoryService','siteService',
+ops365App.controller('incidentupdateCtrl',['$rootScope', '$scope','$filter','$ionicPopover','$ionicModal',
+                                           '$ionicPopup','$stateParams','$state',
+                                           'userService','ticketService','statusService',
+                                           'ticketCategoryService','siteService','$ionicHistory','assetService',
                                            function($rootScope,$scope,$filter,$ionicPopover,$ionicModal,$ionicPopup,
-                                        $stateParams,$state,userService,ticketService,statusService,ticketCategoryService,siteService) {
+                                        $stateParams,$state,userService,ticketService,statusService,
+                                        ticketCategoryService,siteService,$ionicHistory,assetService) {
 		 $scope.ticketData={};
 		$scope.categoryList=[];
 		//$scope.ticketData.ticketNumber = null;
-
+		 $scope.asset={
+				 selected:{},
+				 list:[]
+		 }
+		$scope.goBack = function() {
+			//$window.history.go(-1);
+			$ionicHistory.goBack(-1);
+		}
 	 $scope.init=function(){
-		 console.log($stateParams.selectedticket);
-		 console.log($state.params.selectedticket);
+		// console.log($stateParams.selectedticket);
+		// console.log($state.params.selectedticket);
 		// $scope.getTicketPriority();
 		 $scope.selectedCategory={};
 		 //$scope.ticketData.ticketNumber = "INC003489";
@@ -17,13 +27,11 @@ ops365App.controller('incidentupdateCtrl',['$rootScope', '$scope','$filter','$io
 		 //var selectedTicketId = $state.params.selectedticket.ticketId;
 		// $scope.getStatus();
 		 $scope.token = $.jStorage.get("tokendata");
-		 
+		
 		 //$scope.ticketData.ticketNumber = "INC003489";
          //console.log("shibasish");
-		 $scope.getSelectedTicket($stateParams.selectedticket);
-		 
-		 
-
+		var ticketNumber = $.jStorage.get("ticketId");
+		 $scope.getSelectedTicket(ticketNumber);
 	 }
 
 	 $scope.getSelectedTicket=function(selectedTicketNumber){
@@ -247,26 +255,26 @@ ops365App.controller('incidentupdateCtrl',['$rootScope', '$scope','$filter','$io
 			 }
 		}
 		 
-		 $scope.getStatus=function(){
-			 var token=$scope.token;
-				statusService.retrieveAllStatus(token)
-	                .then(function(data){
-	                	$("#statusSelect").empty();
-	    				var options = $("#statusSelect");
-	    				options.append($("<option />").val("").text("Select status"));
-	    				$.each(data,function(){
-	    					options.append($("<option />").val(	this.statusId).text(	this.status));
-	    				});
-	    				$("#statusSelect option").each(function() {
-							if ($(this).val() == $scope.ticketData.statusId) {
-								$(this).attr('selected', 'selected');
-								return false;
-							}
-					 	});
-	                },function(data){
-	                	console.log(data);
-	                });			
-			}
+	 $scope.getStatus=function(){
+		 var token=$scope.token;
+			statusService.retrieveAllStatus(token)
+                .then(function(data){
+                	$("#statusSelect").empty();
+    				var options = $("#statusSelect");
+    				options.append($("<option />").val("").text("Select status"));
+    				$.each(data,function(){
+    					options.append($("<option />").val(	this.statusId).text(	this.status));
+    				});
+    				$("#statusSelect option").each(function() {
+						if ($(this).val() == $scope.ticketData.statusId) {
+							$(this).attr('selected', 'selected');
+							return false;
+						}
+				 	});
+                },function(data){
+                	console.log(data);
+                });			
+		}
 
 	$ionicPopover.fromTemplateUrl('ticketUpdateTabPop', {
       scope: $scope
@@ -301,96 +309,127 @@ ops365App.controller('incidentupdateCtrl',['$rootScope', '$scope','$filter','$io
    });
 
 	$scope.openIncidentEscalation=function(){
-       $state.go('incidentescalation', { selectedticket: $stateParams.selectedticket });
+       $state.go('incidentescalation', { selectedticket: $scope.ticketData.ticketId });
 	}
 
    $scope.openIncidentHistory=function(){
-       $state.go('incidenthistory', { selectedticket: $stateParams.selectedticket }
-      );
+       $state.go('incidenthistory', { selectedticket: $scope.ticketData.ticketId });
    }
-	   $scope.openIncidentLink=function(){
-	       $state.go('incidentlinkticket', { selectedticket: $scope.ticketData.ticketId }
-	      );
-	   }
-	   $scope.showAssetInfo=function(){
-	   		var alertPopup = $ionicPopup.alert({
-		      title: 'Dont eat that!',
-		      template: 'It might taste good'
-		    });
-		    alertPopup.then(function(res) {
-		      console.log('Thank you for not eating my delicious ice cream cone');
-		    });
-	   }
+   $scope.openIncidentLink=function(){
+       $state.go('incidentlinkticket', { selectedticket: $scope.ticketData.ticketId });
+   }
 	   
-	   $scope.showSiteInfo=function(){
-		   var token=$scope.token;
-		   var siteId = $scope.ticketData.siteId;
-		   $scope.getSelectedSiteData(siteId, token);
-	   }
+   $scope.openIncidentWorkNote=function(){
+       $state.go('worknote', { selectedticket: $scope.ticketData.ticketId });
+   }
+   $scope.showAssetInfo=function(){
+	   var token=$scope.token;
+	   $scope.getAssetDetails($scope.ticketData.assetId, token);
+   }
 	   
-	   $scope.getSelectedSiteData=function(siteId, token){
-			 siteService.retrieveSiteDetails(siteId, token)
-	    		.then(function(data) {
-	    			console.log(data)
-	    			var site=angular.copy(data.object);
-	    			$scope.selectedSite={};
-					$scope.selectedSite=angular.copy(site);
-					$scope.selectedSite.siteName = site.siteName;
-					$scope.selectedSite.siteNumber1 = site.siteNumber1;
-					$scope.selectedSite.siteNumber2 = site.siteNumber2;
-					$scope.selectedSite.salesAreaSize = site.salesAreaSize;
-					$scope.selectedSite.siteAddress = site.fullAddress;
-					
-					$scope.selectedSite.siteAddress1 = site.siteAddress1;
-					$scope.selectedSite.siteAddress2 = site.siteAddress2;
-					$scope.selectedSite.siteAddress3 = site.siteAddress3;
-					$scope.selectedSite.siteAddress4 = site.siteAddress4;
-					
-					$scope.selectedSite.district = site.district;
-					$scope.selectedSite.area=site.area;
-					$scope.selectedSite.cluster=site.cluster;
-					
-					/*$scope.district.selected=$scope.selectedSite.district;
-					$scope.area.selected = $scope.selectedSite.area;
-					$scope.cluster.selected = $scope.selectedSite.cluster;*/
-					 
-					$scope.selectedSite.retailerName=site.owner;
-					$scope.selectedSite.primaryContact=site.primaryContact;
-					$scope.selectedSite.secondaryContact=site.secondaryContact;
-					
-					$scope.selectedSite.LicenseDetail = site.siteLicense;
-					$scope.selectedSite.SalesOperation = site.siteOperation;
-					$scope.selectedSite.DeliveryOperation = site.siteDelivery;
-					$scope.selectedSite.submeterDetails = site.siteSubmeter;
-					 
-					$scope.siteLicense = $scope.selectedSite.LicenseDetail;
-					$scope.siteSalesOperation = $scope.selectedSite.SalesOperation;
-					$scope.siteDeliveryOperation = $scope.selectedSite.DeliveryOperation;
-					
-					$scope.siteSubmeterDetails = $scope.selectedSite.submeterDetails;
-					//$scope.siteData.siteId = $scope.selectedSite.siteId;
-	    			//$scope.siteData = angular.copy( $scope.selectedSite);
-					console.log($scope.selectedSite.siteAttachments);
-					var customTemplate='<div class="item ">' 
-						+'<p><i class = "icon icon ion-person"></i>'
-						+'<a href="#" class="subdued"> Address :</a> <a>'+ $scope.selectedSite.siteAddress+'</a>'
-						+'</p><p><i class = "icon ion-android-phone-portrait"></i><a href="#" class="subdued"> Site Number 1:</a> <a>'+ $scope.selectedSite.siteNumber1+'</a>'
-						+'</p><p><i class = "icon ion-android-phone-portrait"></i><a href="#" class="subdued"> Primary Contact:</a> <a>'+ $scope.selectedSite.primaryContact+'</a>'
-						+'</p><p><i class = "icon ion-calendar"></i><a href="#" class="subdued"> Operator :</a> <a>'+ $scope.selectedSite.operator.companyName+'</a>'
-						+'</p><p><i class = "icon icon ion-person"></i><a href="#" class="subdued"> Retailer :</a> <a>'+ $scope.selectedSite.retailerName+'</a>'
-						+'</p><p><i class = "icon icon ion-android-mail"></i><a href="#" class="subdued"> Owner :</a> <a>'+ $scope.selectedSite.email+'</a>'
-						+'</p></div>';
-					var alertPopup = $ionicPopup.alert({
-					      title: $scope.selectedSite.siteName,
-					      template: customTemplate
-					 });
-					    alertPopup.then(function(res) {
-					    //console.log('Thank you for not eating my delicious ice cream cone');
-				    });
-	    		},function(data){
-	    			console.log(data);
-	    		});
-	    		
-		 }
+   $scope.showSiteInfo=function(){
+	   var token=$scope.token;
+	   var siteId = $scope.ticketData.siteId;
+	   $scope.getSelectedSiteData(siteId, token);
+   }
+	   
+   $scope.getSelectedSiteData=function(siteId, token){
+		 siteService.retrieveSiteDetails(siteId, token)
+    		.then(function(data) {
+    			console.log(data)
+    			var site=angular.copy(data.object);
+    			$scope.selectedSite={};
+				$scope.selectedSite=angular.copy(site);
+				$scope.selectedSite.siteName = site.siteName;
+				$scope.selectedSite.siteNumber1 = site.siteNumber1;
+				$scope.selectedSite.siteNumber2 = site.siteNumber2;
+				$scope.selectedSite.salesAreaSize = site.salesAreaSize;
+				$scope.selectedSite.siteAddress = site.fullAddress;
+				
+				$scope.selectedSite.siteAddress1 = site.siteAddress1;
+				$scope.selectedSite.siteAddress2 = site.siteAddress2;
+				$scope.selectedSite.siteAddress3 = site.siteAddress3;
+				$scope.selectedSite.siteAddress4 = site.siteAddress4;
+				
+				$scope.selectedSite.district = site.district;
+				$scope.selectedSite.area=site.area;
+				$scope.selectedSite.cluster=site.cluster;
+				
+				/*$scope.district.selected=$scope.selectedSite.district;
+				$scope.area.selected = $scope.selectedSite.area;
+				$scope.cluster.selected = $scope.selectedSite.cluster;*/
+				 
+				$scope.selectedSite.retailerName=site.owner;
+				$scope.selectedSite.primaryContact=site.primaryContact;
+				$scope.selectedSite.secondaryContact=site.secondaryContact;
+				
+				$scope.selectedSite.LicenseDetail = site.siteLicense;
+				$scope.selectedSite.SalesOperation = site.siteOperation;
+				$scope.selectedSite.DeliveryOperation = site.siteDelivery;
+				$scope.selectedSite.submeterDetails = site.siteSubmeter;
+				 
+				$scope.siteLicense = $scope.selectedSite.LicenseDetail;
+				$scope.siteSalesOperation = $scope.selectedSite.SalesOperation;
+				$scope.siteDeliveryOperation = $scope.selectedSite.DeliveryOperation;
+				
+				$scope.siteSubmeterDetails = $scope.selectedSite.submeterDetails;
+				//$scope.siteData.siteId = $scope.selectedSite.siteId;
+    			//$scope.siteData = angular.copy( $scope.selectedSite);
+				console.log($scope.selectedSite.siteAttachments);
+				var customTemplate='<div class="item ">' 
+					+'<p><i class = "icon icon ion-person"></i>'
+					+'<a href="#" class="subdued"> Address :</a> <a>'+ $scope.selectedSite.siteAddress+'</a>'
+					+'</p><p><i class = "icon ion-android-phone-portrait"></i><a href="#" class="subdued"> Site Number 1:</a> <a>'+ $scope.selectedSite.siteNumber1+'</a>'
+					+'</p><p><i class = "icon ion-android-phone-portrait"></i><a href="#" class="subdued"> Primary Contact:</a> <a>'+ $scope.selectedSite.primaryContact+'</a>'
+					+'</p><p><i class = "icon ion-calendar"></i><a href="#" class="subdued"> Operator :</a> <a>'+ $scope.selectedSite.operator.companyName+'</a>'
+					+'</p><p><i class = "icon icon ion-person"></i><a href="#" class="subdued"> Retailer :</a> <a>'+ $scope.selectedSite.retailerName+'</a>'
+					+'</p><p><i class = "icon icon ion-android-mail"></i><a href="#" class="subdued"> Owner :</a> <a>'+ $scope.selectedSite.email+'</a>'
+					+'</p></div>';
+				var alertPopup = $ionicPopup.alert({
+				      title: $scope.selectedSite.siteName,
+				      template: customTemplate
+				 });
+				    alertPopup.then(function(res) {
+				    //console.log('Thank you for not eating my delicious ice cream cone');
+			    });
+    		},function(data){
+    			console.log(data);
+    		});
+    		
+	 }
+   
+   $scope.getAssetDetails=function(assetId, token){
+		 assetService.getAssetInfo(assetId, token)
+		 .then(function(data){
+			if(data.statusCode == 200){
+				$scope.selectedAsset=angular.copy(data.object);
+				console.log($scope.selectedAsset)
+				var assetType="EQUIPMENT";
+				if($scope.selectedAsset.assetType=="E"){
+					assetType="EQUIPMENT"
+				}else{
+					assetType="SERVICE"
+				}
+				var customTemplate='<div class="item ">' 
+					+'<p><i class = "icon icon ion-person"></i>'
+					+'<a href="#" class="subdued"> Asset Code :</a> <a>'+ $scope.selectedAsset.assetCode+'</a>'
+					+'</p><p><i class = "icon ion-android-phone-portrait"></i><a href="#" class="subdued"> Asset Type:</a> <a>'+ assetType+'</a>'
+					+'</p><p><i class = "icon ion-android-phone-portrait"></i><a href="#" class="subdued"> Asset Category: </a> <a>'+ $scope.selectedAsset.category+'</a>'
+					+'</p><p><i class = "icon ion-calendar"></i><a href="#" class="subdued"> Asset Location :</a> <a>'+ $scope.selectedAsset.locationName+'</a>'
+					+'</p></div>';
+				var alertPopup = $ionicPopup.alert({
+				      title: $scope.selectedAsset.assetName,
+				      template: customTemplate
+				 });
+				    alertPopup.then(function(res) {
+				    //console.log('Thank you for not eating my delicious ice cream cone');
+			    });
+			} 
+		 },function(data){
+			 console.log(data);
+		 });
+	
+	
+	}
 
      }]);

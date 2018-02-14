@@ -1,20 +1,25 @@
 ops365App.controller('incidentlinkticketCtrl',
 		['$rootScope', '$scope','$filter','$ionicPopover','$stateParams','$state','userService',
-        'ticketEscalationService','ticketService',
-	 function($rootScope,$scope,$filter,$ionicPopover,$stateParams,$state,userService,ticketEscalationService,ticketService) {
+        'ticketEscalationService','ticketService','$ionicHistory',
+	 function($rootScope,$scope,$filter,$ionicPopover,$stateParams,$state,userService,ticketEscalationService,ticketService,$ionicHistory) {
     
     $scope.linkedTicketDetails=[];
     $scope.linkedTicket={
 				'ticketNumber':''
 		};
+    $scope.goBack = function() {
+		//$window.history.go(-1);
+		$ionicHistory.goBack(-1);
+	}
    // var selectedTicketNumber = $state.params.selectedticket.ticketNumber;
 	//var selectedTicketId = $state.params.selectedticket.ticketId;
-    console.log($state.params.selectedticket);
+   // console.log($state.params.selectedticket);
     $scope.init=function(){			
     	 $scope.token = $.jStorage.get("tokendata");
     	 console.log( $scope.token)
-    	  console.log($stateParams.selectedticket);
-		 $scope.getLinkedTicketDetails($stateParams.selectedticket);		 
+    	//  console.log($stateParams.selectedticket);
+    	 var ticketNumber = $.jStorage.get("ticketId");
+		 $scope.getLinkedTicketDetails(ticketNumber);		 
 
 	}
 

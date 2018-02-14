@@ -1,86 +1,73 @@
 ops365App.controller('incidentescupdateCtrl',
 		['$rootScope', '$scope','$filter','$ionicPopover','$ionicModal','$ionicPopup','$stateParams','$state','userService',
-        'ticketEscalationService','ticketService','ionicToast',
-	 function($rootScope,$scope,$filter,$ionicPopover,$ionicModal,$ionicPopup,$stateParams,$state,userService,ticketEscalationService,ticketService,ionicToast) {
+        'ticketEscalationService','ticketService','ionicToast','$window',
+	 function($rootScope,$scope,$filter,$ionicPopover,$ionicModal,$ionicPopup,$stateParams,
+			 $state,userService,ticketEscalationService,ticketService,ionicToast, $window) {
  console.log($state.params.selectedticket);
-var ticketNumber = $state.params.selectedticket.ticketNumber;
+//var ticketNumber = $state.params.selectedticket.ticketNumber;
 $scope.escalationLevelDetails=[];
 $scope.modal = {};
 $scope.selectedEscalation={};
 
-$scope.init=function(){			
-         console.log($state.params.selectedticket);
-         
-		 $scope.getEscalationLevel(ticketNumber);
+$scope.goBack = function() {
+	$window.history.go(-1);
+	//$ionicHistory.goBack(-1);
+}
+		$scope.init=function(){			
+        // console.log($state.params.selectedticket);
+       //  console.log($stateParams.selectedticket);
+		
 		// $scope.initializeEscalateTicket();
-
-	}
-
-    $scope.getEscalationLevel=function(){
-		$scope.escalationLevelDetails=[{
-			'escId':1,
-			'spId':100,
-			'escLevelId':1,
-			'escLevelDesc':'Level 1',
-			'escTo':'Shibasish Mohanty',
-			'escEmail':'shib@mohanty@gmail.com',
-			'ticketNumber':'INC0034590',
-			'ticketId':12,
-			'escStatus':null
-		},
-		{
-			'escId':2,
-			'spId':101,
-			'escLevelId':2,
-			'escLevelDesc':'Level 2',
-			'escTo':'Malay Panigrahi',
-			'escEmail':'mkp@gmail.com',
-			'ticketNumber':'INC0090760',
-			'ticketId':20,
-			'escStatus':'escalated'
+		 $scope.loggedInUser = $.jStorage.get('loggedInUser');
+		 $scope.token=$.jStorage.get('tokendata');
+		 var ticketNumber = $.jStorage.get("ticketId");
+		 $scope.getEscalationLevel(ticketNumber);
 		}
 
-		]
-        // ticketEscalationService.retrieveEscLevel(ticketNumber)
-        // .then(function(data){
-        //     if(data.statusCode == 200){
-        //         $scope.escalationLevelList=angular.copy(data.object);
-        //         $.each($scope.escalationLevelList,function(key,val){
-		// 				var escLevelData={
-		// 						escId:val.escId,
-		// 						spId:val.serviceProviderId,
-		// 						escLevelId:val.levelId,
-		// 						escLevelDesc:val.escalationLevel,
-		// 						escTo:val.escalationPerson,
-		// 						escEmail:val.escalationEmail,                                
-		// 						ticketNumber:ticketNumber,
-		// 						ticketId:val.ticketId,
-		// 						escStatus:val.status,
-		// 				};
-		// 				$scope.escalationLevelDetails.push(escLevelData);
-		// 			});
-        //     }
+    $scope.getEscalationLevel=function(ticketNumber){
+    	var token = $scope.token;
+        ticketEscalationService.retrieveEscLevel(ticketNumber,  token)
+        .then(function(data){
+        	console.log(data);
+            if(data.statusCode == 200){
+            	if(data.object.escalationLevelList.length>0){
+		               $.each(data.object.escalationLevelList,function(key,val){
+							var escLevelData={
+								escId : val.escId,
+								spId : val.serviceProviderId,
+								escLevelId : val.levelId,
+								escLevelDesc : val.escalationLevel,
+								escTo : val.escalationPerson,
+								escEmail : val.escalationEmail,
+								ticketNumber : ticketNumber,
+								ticketId : val.ticketId,
+								escStatus : val.status,
+						};
+							$scope.escalationLevelDetails.push(escLevelData);
+		             });
+				}
+           }
 
-        // },function(data){
-        //     console.log(data);
-        // });			
-		}
+        },function(data){
+          console.log(data);
+      });			
+   }
 
 	$scope.getSelectedEscalation=function(selectedEscalation,id){
 
-	angular.forEach($scope.escalationLevelDetails, function(escalation, index) {
-    if (id != index) 
-      escalation.checked = false;
-  	});
-		$scope.selectedEscalation = angular.copy(selectedEscalation)
-		console.log($scope.selectedEscalation);
-		if(selectedEscalation.escStatus == 'escalated'){
-			//$scope.showAlert(selectedEscalation);
-			$scope.showToast(selectedEscalation);
-		}
-		else{
-			$scope.showConfirm(selectedEscalation);
-		}
+		angular.forEach($scope.escalationLevelDetails, function(escalation, index) {
+	    if (id != index) 
+	      escalation.checked = false;
+	  	});
+			$scope.selectedEscalation = angular.copy(selectedEscalation)
+			console.log($scope.selectedEscalation);
+			if(selectedEscalation.escStatus!=null && selectedEscalation.escStatus.toUpperCase() == 'ESCALATED'){
+				//$scope.showAlert(selectedEscalation);
+				$scope.showToast(selectedEscalation);
+			}
+			else{
+				$scope.showConfirm(selectedEscalation);
+			}
 	}
 // When button is clicked, the popup will be shown...
    $scope.showConfirm = function(selectedEscalation) {
@@ -95,7 +82,7 @@ $scope.init=function(){
       confirmPopup.then(function(res) {
          if(res) {
             console.log('Sure!');
-			$scope.escalateTicket(selectedEscalation);
+			$scope.escalateTicket(selectedEscalation, $scope.loggedInUser, $scope.token);
          } else {
             console.log('Not sure!');
 			selectedEscalation.checked = false;
@@ -122,11 +109,11 @@ $scope.init=function(){
   selectedEscalation.checked = false;
 };
 
-   $scope.escalateTicket=function(selectedEscalation){
+   $scope.escalateTicket=function(selectedEscalation, user, token){
 		//console.log($scope.selectedEscalation);
 		
 		if(selectedEscalation != "undefined"){			
-			ticketService.escalateTicket(selectedEscalation)
+			ticketService.escalateTicket(selectedEscalation, user.object, token)
 			.then(function(data){
 				console.log(data);
 				if(data.statusCode ==200){

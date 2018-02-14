@@ -1,8 +1,8 @@
 //angular.module('starter.controllers', [])
 
 ops365App.controller('LoginCtrl',
-		['$rootScope', '$scope','$filter','$state','userService','appService','$ionicLoading',
-	 function($rootScope,$scope,$filter,$state,userService,appService, $ionicLoading) {
+		['$rootScope', '$scope','$filter','$state','userService','appService','$ionicLoading','ionicToast',
+	 function($rootScope,$scope,$filter,$state,userService,appService, $ionicLoading, ionicToast) {
     $scope.user={};
 	var loggedInuser =null;
 
@@ -14,17 +14,23 @@ ops365App.controller('LoginCtrl',
 			$scope.getBasicToken(user);
 		};
 		
-		$scope.getBasicToken=function(user){
-			appService.getBasicAuth(user)
-			.then(function(data){
-				console.log(data)
-				if(data.statusCode==200){
-					$scope.getUserDetails(user, data);
-				}
-			},function(data){
-				console.log(data)
-			});
-		};
+		   $scope.showToast = function(message){
+			   ionicToast.show(message, 'middle', false, 2000);
+		   };
+			$scope.getBasicToken=function(user){
+				appService.getBasicAuth(user)
+				.then(function(data){
+					console.log(data)
+					if(data.statusCode==200){
+						$scope.getUserDetails(user, data);
+					}
+				},function(data){
+					console.log(data)
+					if(data.statusCode==401 || data.statusCode==500){
+						 $scope.showToast("Invalid username or password");
+					}
+				});
+			};
 		
 		$scope.getUserDetails=function(user,tokendata){
 			 $scope.showLoading();

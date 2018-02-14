@@ -3,8 +3,8 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-var hostLocation= window.location.protocol + "//" + window.location.hostname+":"+ window.location.port
-var ops365App=angular.module('ops365App', ['ionic','ionic-toast']);
+var hostLocation= window.location.protocol + "//" + window.location.hostname+":9191";
+var ops365App=angular.module('ops365App', ['ionic','ionic-toast','ion-floating-menu']);
 //angular.module('starter', ['ionic','starter.controllers'])
 
 ops365App.run(function($ionicPlatform) {
@@ -25,7 +25,11 @@ ops365App.run(function($ionicPlatform) {
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider,$ionicConfigProvider) {
+	$ionicConfigProvider.backButton.previousTitleText(false);
+	$ionicConfigProvider.backButton.icon('ion-chevron-left');
+	$ionicConfigProvider.backButton.text('')
+
   $stateProvider
     .state('login', {
     url: '/login',
@@ -57,13 +61,22 @@ ops365App.run(function($ionicPlatform) {
       controller: 'incidentupdateCtrl'     
     })
     .state('incidentescalation',{
-      url:'/incidentescalation',
+      url:'/incidentescalation/:selectedticket',
       params: {
         selectedticket: null
       },
       //abstract: true,
       templateUrl:'templates/incidentescalation.html',
       controller: 'incidentescupdateCtrl'      
+    })
+    .state('incidentview',{
+      url:'/incidentview/:selectedticket',
+      params: {
+        selectedticket: null
+      },
+      //abstract: true,
+      templateUrl:'templates/incidentview.html',
+      controller: 'incidentviewCtrl'      
     })
     .state('incidenthistory',{
       url:'/incidenthistory/:selectedticket',

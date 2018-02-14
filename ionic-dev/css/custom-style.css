@@ -416,3 +416,19 @@ body {
   }
 }
 
+@-webkit-keyframes listGrow {
+  0% {
+    -webkit-transform: scale3d(1, 0, 1);
+  }
+ 
+  100% {
+    -webkit-transform: scale3d(1, 1, 0);
+  }
+}
+ 
+.list-grow-animation {
+  -webkit-animation: listGrow ease-in 1;
+  animation: listGrow ease-in 1;
+  -webkit-animation-duration: 400ms;
+  animation-duration: 400ms;
+}

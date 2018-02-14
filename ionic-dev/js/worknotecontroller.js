@@ -1,49 +1,72 @@
 
-ops365App.controller('worknoteCtrl', function($scope, $timeout, $ionicScrollDelegate) {
+ops365App.controller('worknoteCtrl',['$rootScope','$scope','$filter','$stateParams','$state','ticketService',
+ function($rootScope,$scope,$filter,$stateParams,$state, ticketService) {
 
   $scope.hideTime = true;
+  $scope.data = {};
+  //$scope.myId = '12345';
+  $scope.messages = [];
+  $scope.ticketComments=[];
+  $scope.ticketComment={
+				'comment':''
+		};
 
-  var alternate,
-    isIOS = ionic.Platform.isWebView() && ionic.Platform.isIOS();
+    $scope.init=function(){		 	
+     $scope.token = $.jStorage.get("tokendata");
+     //console.log($state.params.selectedticket);
+    // console.log($stateParams.selectedticket);
+     var ticketNumber = $.jStorage.get("ticketId");
 
-  $scope.sendMessage = function() {
-    alternate = !alternate;
+     $scope.getTicketComments(ticketNumber,  $scope.token);
+      
+    }
 
-    var d = new Date();
-  d = d.toLocaleTimeString().replace(/:\d+ /, ' ');
+  $scope.getTicketComments=function(ticketId, token){
+	  ticketService.getComments(ticketId,token)
+		 .then(function(data){
+			 console.log(data);
+			 if(data.object.length>0){
+				 $scope.ticketComments=[];
+				 $.each(data.object,function(key,val){
+					 selectedTicketNumber=val.ticketNumber;
+					  $scope.ticketComments.push(val);
+				 })
+				 console.log($scope.ticketComments)
+			}
+		 },function(data){
+			 console.log(data);
+		 });
+  }
 
-    $scope.messages.push({
-      userId: alternate ? '12345' : '54321',
-      text: $scope.data.message,
-      time: d
-    });
-
-    delete $scope.data.message;
-    $ionicScrollDelegate.scrollBottom(true);
-
-  };
-
-
-  $scope.inputUp = function() {
-    if (isIOS) $scope.data.keyboardHeight = 216;
-    $timeout(function() {
-      $ionicScrollDelegate.scrollBottom(true);
-    }, 300);
-
-  };
-
-  $scope.inputDown = function() {
-    if (isIOS) $scope.data.keyboardHeight = 0;
-    $ionicScrollDelegate.resize();
-  };
+$scope.addNewComment = function(){
+		console.log("comment added");
+		var user = $.jStorage.get('loggedInUser');
+		$scope.CurrentDate = new Date();
+		$scope.CurrentDate = $filter('date')(new Date(), 'dd-MM-yyyy');
+		if($scope.ticketComment.comment != ""){			
+			var ticketComment={
+					  ticketId:$state.params.selectedticket,
+					  ticketNumber : selectedTicketNumber,
+					  comment:$scope.ticketComment.comment,
+					  createdBy:user.object.userName
+			}
+     // $scope.ticketComments.push(ticketComment);
+			 console.log(ticketComment);
+			var token = $scope.token; 
+			 ticketService.saveComment(ticketComment, token)
+			 .then(function(data){
+				 console.log(data);
+				 if(data.statusCode == 200){					 
+					 $scope.ticketComments.push(data.object);
+				 }
+			 },function(data){
+				 console.log(data);
+			 });
+		}
+		 
+	};
 
   $scope.closeKeyboard = function() {
     // cordova.plugins.Keyboard.close();
   };
-
-
-  $scope.data = {};
-  $scope.myId = '12345';
-  $scope.messages = [];
-
-});
+}]);

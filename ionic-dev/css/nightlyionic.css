@@ -3909,9 +3909,9 @@ a.subdued {
   .bar.item-input-inset .item-input-wrapper {
     margin-top: -1px; }
     .bar.item-input-inset .item-input-wrapper input {
-      padding-left: 8px;
-      width: 94%;
-      height: 28px;
+      padding-left: 0px;
+    width: 100%;
+    height: 50px;
       background: transparent; }
   .bar.bar-light {
     border-color: #ddd;
@@ -7624,7 +7624,7 @@ textarea {
   align-items: center;
   position: relative;
   overflow: hidden;
-  padding: 10.66667px; }
+  padding: 0.66667px; }
 
 .item-input-wrapper {
   display: -webkit-box;

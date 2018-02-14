@@ -1,0 +1,130 @@
+<ion-view view-title="View Incident" data-ng-init="init()" hide-back-button="true" animation="slide-left-right"ss>
+	<ion-nav-buttons side="left">
+    <button class="button button-clear" ng-click="goBack()" >
+    <i class="icon ion-ios-arrow-back"></i>
+    </button>
+    </ion-nav-buttons>
+  <ion-content  padding="true" scroll="true" style="background-color: #607D8B;">
+  	<div class="list list-inset">
+  		<div class="item item-avatar item-icon-right item-text-wrap">
+    		<img src="img/incident.png">
+    			<h3>Incident Number</h3>
+    		<p>{{ticketData.ticketNumber}}</p>
+    	</div>
+    	<div class="item">
+    		<p>
+    			<i class = "icon icon ion-person"></i>
+      			<a href="#" class="subdued">Created by:</a> <a>{{ticketData.raisedBy}}</a>
+      		</p>
+      		<p>
+      			<i class = "icon ion-calendar"></i>
+     			<a href="#" class="subdued">Created On:</a> <a>{{ticketData.raisedOn}}</a>
+    		</p>
+      		<p>
+      			<i class = "icon ion-calendar assertive"></i>
+     			<a href="#" class="subdued assertive">SLA due date:</a> <a>{{ticketData.sla}}</a>
+    		</p>
+      		<p>
+      			<i class = "icon ion-calendar"></i>
+     			<a href="#" class="subdued">Issue Start Time:</a> <a>{{ticketData.ticketStartTime}}</a>
+    		</p>
+    		<p>
+    		    <i class = "icon icon ion-person"></i>
+      			<a class="subdued">Assigned to:</a> <a>{{ticketData.assignedSP}}</a>
+      		</p>
+      		<p>
+    		    <i class = "icon icon ion-flag"></i>
+      			<a class="subdued">Status:</a> <a>{{ticketData.status}}</a>
+      		</p>
+      	</div>
+  	</div>
+
+    <div class="list card">
+  	<a class="item">
+	    SLA%
+	    <span class="badge badge-assertive">{{ticketData.slaPercent}}</span>
+	  </a>
+	  <div class="item item-button-right item-text-wrap">
+	    Site Name
+	    <p>{{ticketData.siteName}}</p>
+	    <button class="button button-clear button-positive" ng-click="showSiteInfo()">
+	  	<i class="icon icon ion-information-circled"></i>
+	    </button>
+	  </div>
+	  <div class="item item-button-right item-text-wrap">
+	    Asset Name
+	    <p>{{ticketData.assetName}}</p>
+		<button class="button button-clear button-positive" ng-click="showAssetInfo()">
+	     <i class="icon icon ion-information-circled"></i>
+	    </button>
+	  </div>
+	</div>
+	</div>
+	<div class="list list-inset">
+		<div class="item item-divider">
+			Ticket Primary Details
+		</div>
+		<a class="item item-text-wrap">
+			<h4>Description</h4>
+			<p>{{ticketData.description}}</p>
+		</a>	
+		<a class="item item-text-wrap">
+			<h4>Ticket Category</h4>
+			<p>{{ticketData.categoryName}}</p>
+		</a>
+		<a class="item item-text-wrap">
+			<h4>Priority</h4>
+			<p>{{ticketData.priorityDescription}}</p>
+		</a>
+	</div>
+
+<!-- 	<div class="list list-inset">
+		<div class="item item-divider">
+  			Linked Tickets
+  		</div>
+  		<a class="item" ng-repeat="linkedTicket in linkedTicketDetails">
+  			{{linkedTicket.ticketnumber}}}
+			<span ng-class="{{linkedTicket.status == 'CLOSED'}} ? 'badge badge-assertive' : 'badge badge-success'">{{linkedTicket.status}}</span>  			
+  		</a>   		
+  	</div>
+
+	<div class="list list-inset">
+		<div class="item item-divider">
+  			{{filecount}} Attachment(s)
+  		</div>
+  		<a class="item item-icon-right" ng-repeat="file in filedetails">
+  			<i class="icon  ion-android-download"></i>
+  			{{file.filename}}}
+  		</a>
+   		
+  	</div> -->
+  </ion-content>
+    <ion-floating-menu icon="ion-android-expand" menu-color="green" menu-open-color="#7CFC00">
+    <ion-floating-item icon="ion-ios-timer-outline" text="View History" button-color="#7CFC00" click="OpenHistory()"></ion-floating-item>
+    <ion-floating-item icon="ion-document" text="View Work Notes" button-color="#7CFC00" click="OpenWorkNote()"></ion-floating-item>
+</ion-floating-menu>
+<!--    <div class = "bar bar-footer" ng-controller="incidentupdateCtrl">
+  <div class = "tabs tabs-icon-top">
+   <a class = "tab-item" ng-click="openIncidentLink()">
+      <i class = "icon ion-home"></i>
+      Link Ticket
+   </a>
+	
+   <a class = "tab-item" ng-click="openIncidentEscalation()">
+      <i class = "icon ion-star"></i>
+      Escalation
+   </a>
+	
+   <a class = "tab-item" ng-click="openIncidentHistory()">
+      <i class = "icon ion-planet"></i>
+      History
+   </a>
+
+   <a class = "tab-item" ng-click="openIncidentWorkNote()">
+      <i class = "icon ion-planet"></i>
+      Work Notes
+   </a>
+</div>
+</div> -->
+
+</ion-nav-view>

@@ -1,6 +1,6 @@
 ops365App.controller('incidentlistCtrl',
-	['$rootScope', '$scope','$filter','$ionicPopover','$state','userService','ticketService',
-	 function($rootScope,$scope,$filter,$ionicPopover,$state,userService,ticketService) {
+	['$rootScope', '$scope','$filter','$ionicPopover','$state','userService','ticketService','ionicToast',
+	 function($rootScope,$scope,$filter,$ionicPopover,$state,userService,ticketService,ionicToast) {
          $scope.ticket={
 			 selected:{},
 			 list:[]
@@ -18,7 +18,9 @@ ops365App.controller('incidentlistCtrl',
              //= selectedTicketNo;
              console.log($scope.ticket.selected);
           };
-
+          $scope.showToast = function(message){
+			   ionicToast.show(message, 'middle', false, 2000);
+		   };
 
    $scope.closePopover = function() {
       $scope.popover.hide();
@@ -42,8 +44,16 @@ ops365App.controller('incidentlistCtrl',
    });*/
  $scope.openIncidentUpdate=function(){
 	 console.log($scope.ticket);
+	 $scope.ticket.selected.mode = "EDIT";
+	 $.jStorage.set("ticketId", $scope.ticket.selected.ticketId);
 	 $state.go('incidentupdate',{ selectedticket: $scope.ticket.selected.ticketId });
    }
+
+ $scope.openIncidentView=function(){
+   $scope.ticket.selected.mode = "VIEW";
+   $.jStorage.set("ticketId", $scope.ticket.selected.ticketId);
+     $state.go('incidentview',   { selectedticket: $scope.ticket.selected.ticketId });
+ } 
 
    $scope.init=function(){
 			$scope.findAllTickets();
@@ -70,7 +80,10 @@ ops365App.controller('incidentlistCtrl',
 				//populateDataTable($scope.ticket.list,'ticketList');
 				}
 			},function(data){
-				//console.log(data);
+				console.log(data);
+				if(data.error=="invalid_token"){
+					$scope.showToast("Your session is expired");
+				}
 			});			
 			
 		}

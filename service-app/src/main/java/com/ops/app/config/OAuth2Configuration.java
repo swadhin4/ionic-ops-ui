@@ -61,6 +61,7 @@ public class OAuth2Configuration {
                     .authorizeRequests()
                     .antMatchers("/hello/").permitAll()
                     .antMatchers("/basic/token/").permitAll()
+                    .antMatchers("/asset/**").authenticated()
                     .antMatchers("/site/**").authenticated()
                     .antMatchers("/incident/**").authenticated()
                     .antMatchers("/secure/**").authenticated();

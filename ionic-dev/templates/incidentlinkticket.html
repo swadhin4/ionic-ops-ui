@@ -1,4 +1,9 @@
-<ion-view view-title="Link Ticket" data-ng-init="init()">
+<ion-view view-title="Link Ticket" data-ng-init="init()"  hide-back-button="true">
+<ion-nav-buttons side="left">
+    <button class="button button-clear" ng-click="goBack()" >
+    <i class="icon ion-ios-arrow-back"></i>
+    </button>
+    </ion-nav-buttons>
 	<ion-content padding="true" scroll="true" style="background-color: #607D8B;">
 		<div class="list list-inset">
 			<h4>Link New Ticket</h4>
@@ -34,4 +39,27 @@
 				</div>			
 		</div>
 	</ion-content>
+   <div class = "bar bar-footer" ng-controller="incidentupdateCtrl">
+  <div class = "tabs tabs-icon-top">
+   <a class = "tab-item" ng-click="openIncidentLink()">
+      <i class = "icon ion-home"></i>
+      Link Ticket
+   </a>
+	
+   <a class = "tab-item" ng-click="openIncidentEscalation()">
+      <i class = "icon ion-star"></i>
+      Escalation
+   </a>
+	
+   <a class = "tab-item" ng-click="openIncidentHistory()">
+      <i class = "icon ion-planet"></i>
+      History
+   </a>
+
+   <a class = "tab-item" ng-click="openIncidentWorkNote()">
+      <i class = "icon ion-planet"></i>
+      Work Notes
+   </a>
+</div>
+</div>
 </ion-view>

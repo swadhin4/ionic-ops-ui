@@ -1,16 +1,20 @@
 ops365App.controller('incidenthistoryCtrl',
 		['$rootScope', '$scope','$filter','$ionicPopover','$stateParams','$state','userService',
-        'ticketEscalationService','ticketService','appService',
-	 function($rootScope,$scope,$filter,$ionicPopover,$stateParams,$state,userService,ticketEscalationService,ticketService,appService) {
+        'ticketEscalationService','ticketService','appService','$ionicHistory',
+	 function($rootScope,$scope,$filter,$ionicPopover,$stateParams,$state,userService,ticketEscalationService,ticketService,appService, $ionicHistory) {
      
 	 $scope.ticketHistoryDetail={};
         
+	 $scope.goBack = function() {
+			//$window.history.go(-1);
+			$ionicHistory.goBack(-1);
+		}
          $scope.init=function(){
         	 $scope.token = $.jStorage.get("tokendata");
         	 console.log( $scope.token)
-        	  console.log($stateParams.selectedticket);
-        	  var ticketId =  $state.params.selectedticket;
-			 $scope.getTicketHistory(ticketId);
+        	//  console.log($stateParams.selectedticket);
+        	 var ticketNumber = $.jStorage.get("ticketId");
+			 $scope.getTicketHistory(ticketNumber);
 			 $scope.CurrentDate = new Date();
 			 $scope.CurrentDate = $filter('date')(new Date(), 'dd-MM-yyyy');		 
 		}

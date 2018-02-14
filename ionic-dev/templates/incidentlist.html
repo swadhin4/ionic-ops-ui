@@ -1,24 +1,43 @@
+<style>
+.pull-right{    margin-left: 218px;
+    top: 0px;
+    position: relative;
+    font-size: 31px;}
 
-<ion-view view-title="Incident List" data-ng-init="init()" >
-	<ion-content padding="true" scroll="true" style="background-color: #607D8B;">
+</style>
+<ion-view view-title="Incident List" data-ng-init="init()" animation="slide-left-right">
+	<ion-content class="slide-in-both-ways" padding="true" scroll="true" style="background-color: #607D8B;">
 	  <div class="list list-inset">
 	  	<label class="item item-input">
 	    	<i class="icon ion-search placeholder-icon"></i>
 	    	<input type="text" placeholder="Search" ng-model="search">
 	  	</label>
 	</div>
-	<div class = "card list" >
-      <i class="item item-avatar item-icon-right item-text-wrap" href="#" 
-            ng-repeat="ticket in ticket.list | filter:search" href="#/incidentlist/{{ticket.ticketNumber}}">
-        <img src="img/incident.png">
-        <i class="icon ion-android-more-vertical" ng-click = "openPopover($event,ticket.ticketNumber,ticket.ticketId)"></i>
+	<!-- <div class="list list-inset">
+      <ion-item class="item-remove-animate item-avatar item-icon-right list-grow-animation" ng-repeat="ticket in ticket.list | filter:search">
+        <img src="img/incident.png" >
+        <i class="icon ion-android-more-vertical" href style="top: -40px;" ng-click = "openPopover($event,ticket.ticketNumber,ticket.ticketId)"></i>
         <h3>{{ticket.ticketNumber}}</h3>
         <p align="left"> {{ticket.raisedOn}} </p>
         <p> {{ticket.ticketTitle}}</p>
          <p align="left"> {{ticket.status}} </p>
          <p align="left">SLA: {{ticket.sla}} </p>
-      </i>
-    </div> 
+      </ion-item>
+    </div>  -->
+    
+      <div class="list list-inset list-grow-animation" ng-repeat="ticket in ticket.list | filter:search">
+    	<div class="item-remove-animate item-avatar " >
+    		<img src="img/incident.png"> 
+    		 <h3 style="font-size: 15px;    margin-bottom: -26px;">{{ticket.ticketNumber}}</h3>  <a class="icon icon ion-android-more-vertical pull-right" href style="top: -40px;" ng-click = "openPopover($event,ticket.ticketNumber,ticket.ticketId)"></a>
+    		<p class="subdued">SLA: {{ticket.sla}}</p>
+    		<p class="subdued">Created On: {{ticket.raisedOn}}</p>
+    		<p class="subdued"> <i class="icon icon ion-flag" style="color:red"></i> {{ticket.status}}</p> 	 
+    	</div>
+    	<div class="item item-text-wrap">
+    		<p>{{ticket.ticketTitle}}</p>
+    	</div>
+    </div>
+    
   </ion-content>
   <div class="float-button">
 	<span class="height-fix">
@@ -30,9 +49,9 @@
 
   <script id = "ticketViewEditPop" type = "text/ng-template">
    <ion-popover-view fit style="height: 125px;width: 100px" >
-	  <ion-content>
+        <ion-content>
          <div class="list" ng-click="popover.hide()">
-            <a class="item" href="#/incidentview" >
+            <a class="item" ng-click="openIncidentView()" >
               View
             </a>
             <a class="item" ng-click="openIncidentUpdate()" >

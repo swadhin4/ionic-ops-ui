@@ -639,9 +639,10 @@ public class TicketServiceImpl implements TicketService {
 		LOGGER.info("Inside TicketServiceImpl - saveTicketEscalations");
 		TicketEscalation ticketEscalation = new TicketEscalation();
 		TicketEscalationVO savedTicketEscVO = new TicketEscalationVO();
-			ticketEscalation.setTicketId(ticketEscalationLevel.getTicketId());
+		CustomerTicket ticket = customerTicketRepo.findOne(Long.parseLong(ticketEscalationLevel.getTicketNumber()));
+			ticketEscalation.setTicketId(ticket.getId());
 			ticketEscalation.setEscLevelDesc(ticketEscalationLevel.getEscLevelDesc());
-			ticketEscalation.setTicketNumber(ticketEscalationLevel.getTicketNumber());
+			ticketEscalation.setTicketNumber(ticket.getTicketNumber());
 			ticketEscalation.setEscalatedBy(user.getUsername());
 			ticketEscalation.setEscLevelId(ticketEscalationLevel.getEscId());
 			ticketEscalation = ticketEscalationRepo.save(ticketEscalation);
