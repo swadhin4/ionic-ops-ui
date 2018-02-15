@@ -12,40 +12,30 @@
 	    	<i class="icon ion-search placeholder-icon"></i>
 	    	<input type="text" placeholder="Search" ng-model="search">
 	  	</label>
-	</div>
-	<!-- <div class="list list-inset">
-      <ion-item class="item-remove-animate item-avatar item-icon-right list-grow-animation" ng-repeat="ticket in ticket.list | filter:search">
+	 </div>
+	<div class="list list-inset" ng-repeat="ticket in ticket.list | filter:search">
+      <ion-item class="item-remove-animate item-avatar item-icon-right list-grow-animation" >
         <img src="img/incident.png" >
-        <i class="icon ion-android-more-vertical" href style="top: -40px;" ng-click = "openPopover($event,ticket.ticketNumber,ticket.ticketId)"></i>
-        <h3>{{ticket.ticketNumber}}</h3>
-        <p align="left"> {{ticket.raisedOn}} </p>
-        <p> {{ticket.ticketTitle}}</p>
-         <p align="left"> {{ticket.status}} </p>
+        <i class="icon ion-android-more-vertical" href style="top: -27px;" ng-click = "openPopover($event,ticket.ticketNumber,ticket.ticketId)"></i>
+       	 <h3>{{ticket.ticketNumber}}</h3>
+         <p align="left">Created On: {{ticket.raisedOn}} </p>
          <p align="left">SLA: {{ticket.sla}} </p>
+         <p align="left">Status: {{ticket.status}} </p>
       </ion-item>
-    </div>  -->
-    
-      <div class="list list-inset list-grow-animation" ng-repeat="ticket in ticket.list | filter:search">
-    	<div class="item-remove-animate item-avatar " >
-    		<img src="img/incident.png"> 
-    		 <h3 style="font-size: 15px;    margin-bottom: -26px;">{{ticket.ticketNumber}}</h3>  <a class="icon icon ion-android-more-vertical pull-right" href style="top: -40px;" ng-click = "openPopover($event,ticket.ticketNumber,ticket.ticketId)"></a>
-    		<p class="subdued">SLA: {{ticket.sla}}</p>
-    		<p class="subdued">Created On: {{ticket.raisedOn}}</p>
-    		<p class="subdued"> <i class="icon icon ion-flag" style="color:red"></i> {{ticket.status}}</p> 	 
-    	</div>
-    	<div class="item item-text-wrap">
-    		<p>{{ticket.ticketTitle}}</p>
-    	</div>
-    </div>
-    
+       <div class="item item-text-wrap">
+   			<p>{{ticket.ticketTitle}}</p>
+   		</div>
+    </div> 
   </ion-content>
-  <div class="float-button">
+ <!--  <div class="float-button">
 	<span class="height-fix">
 	  	<a class="content">
 	    	<i class="icon ion-ios-plus-empty"> </i>
 	   	</a>
 	  </span>
-</div>
+	</div> -->
+	<ion-floating-button click="openCreateIncident()">    
+</ion-floating-button>
 
   <script id = "ticketViewEditPop" type = "text/ng-template">
    <ion-popover-view fit style="height: 125px;width: 100px" >

@@ -52,12 +52,12 @@ ops365App.controller('incidentlistCtrl',
  $scope.openIncidentView=function(){
    $scope.ticket.selected.mode = "VIEW";
    $.jStorage.set("ticketId", $scope.ticket.selected.ticketId);
-     $state.go('incidentview',   { selectedticket: $scope.ticket.selected.ticketId });
+   $state.go('incidentview',   { selectedticket: $scope.ticket.selected.ticketId });
  } 
 
-   $scope.init=function(){
-			$scope.findAllTickets();
-		}
+ 	$scope.init=function(){
+		$scope.findAllTickets();
+ 	}
     
    	$scope.findAllTickets=function(){
 			console.log("Fetch all ticketlist");   
@@ -87,4 +87,9 @@ ops365App.controller('incidentlistCtrl',
 			});			
 			
 		}
+   	
+    $scope.openCreateIncident=function(){
+        $state.go('incidentcreate',
+        { selectedticket: $state.params.selectedticket });
+    }
 }])

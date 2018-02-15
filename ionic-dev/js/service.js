@@ -22,10 +22,31 @@ ops365App.factory("userService", ['$http','$q',function ($http, $q) {
     var UserService = {
 	 			user:{},
 	            userList: [],	           
-	            validateUser:validateUser	            
+	            validateUser:validateUser,
+	            getUserSiteAccess:getUserSiteAccess
 	        };
 	 	
-	 	return UserService;
+	 	return UserService; 
+	 	
+	 	function getUserSiteAccess(user, tokendata){
+       	  var def = $q.defer();
+	   	  var config = {
+	            headers : {
+	            "Authorization": "Bearer "+tokendata.object.access_token,
+				"Accept" : "application/json"
+				
+	            }
+	      }
+         $http.get(hostLocation+"/ops/api/secure/user/site/access?email="+user.userName, config)
+             .success(function(data) {
+             	console.log(data)
+                 def.resolve(data);
+             })
+             .error(function() {
+                 def.reject("Failed to get user site access list");
+         });
+	   	return def.promise;
+      }
 
     // implementation
         function validateUser(user, tokendata) {
@@ -569,9 +590,16 @@ ops365App.factory('assetService',  ['$http', '$q',function ($http, $q) {
 	
 	    
 	// implementation
-	    function getAssetBySite(siteId) {
+	    function getAssetBySite(siteId, tokendata) {
 	        var def = $q.defer();
-	        $http.get(hostLocation+"/asset/site/list/"+siteId)
+	        var config = {
+	                headers : {
+	                "Authorization": "Bearer "+tokendata.object.access_token,
+					"Accept" : "application/json",
+	                }
+	             
+			 };
+	        $http.get(hostLocation+"/ops/api/asset/site/list/"+siteId, config)
 	            .success(function(data) {
 	            	console.log(data)
 	                def.resolve(data);

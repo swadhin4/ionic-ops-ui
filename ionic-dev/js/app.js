@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 var hostLocation= window.location.protocol + "//" + window.location.hostname+":9191";
-var ops365App=angular.module('ops365App', ['ionic','ionic-toast','ion-floating-menu']);
+var ops365App=angular.module('ops365App', ['ionic','ionic-toast','ion-floating-menu', ,'mobiscroll-datetime', 'mobiscroll-form','ion-datetime-picker']);
 //angular.module('starter', ['ionic','starter.controllers'])
 
 ops365App.run(function($ionicPlatform) {
@@ -51,6 +51,15 @@ ops365App.run(function($ionicPlatform) {
           controller: 'incidentlistCtrl'
         }
       }
+    })
+     .state('incidentcreate',{
+      url:'/incidentcreate',
+      params: {
+        selectedticket: null
+      },
+      //abstract: true,
+      templateUrl:'templates/incidentcreate.html',
+      controller: 'incidentcreateCtrl'      
     })
     .state('incidentupdate',{
       url:'/incidentupdate/:selectedticket',
