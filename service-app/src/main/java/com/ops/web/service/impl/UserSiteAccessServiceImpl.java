@@ -40,8 +40,8 @@ public class UserSiteAccessServiceImpl implements UserSiteAccessService {
 	@Override
 	public List<UserSiteAccess> getUserSiteAccess(Long userId) throws Exception {
 		logger.info("Inside UserSiteAccessServiceImpl .. getUserSiteAccess");
-		User user = userDAO.findOne(userId);
-		List<UserSiteAccess> userSiteAccessList = user.getUserAccessList();
+		//User user = userDAO.findOne(userId);
+		List<UserSiteAccess> userSiteAccessList = userSiteAccessRepo.findSiteAssignedFor(userId);
 		logger.info("Exit UserSiteAccessServiceImpl .. getUserSiteAccess");
 		return userSiteAccessList == null?Collections.EMPTY_LIST:userSiteAccessList;
 	}

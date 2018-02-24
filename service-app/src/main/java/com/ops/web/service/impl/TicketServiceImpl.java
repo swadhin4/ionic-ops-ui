@@ -8,7 +8,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -17,9 +21,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+import com.ops.app.constants.QueryConstants;
 import com.ops.app.util.RandomUtils;
 import com.ops.app.vo.CustomerSPLinkedTicketVO;
 import com.ops.app.vo.CustomerTicketVO;
+import com.ops.app.vo.IncidentVO;
 import com.ops.app.vo.LoginUser;
 import com.ops.app.vo.SPLoginVO;
 import com.ops.app.vo.TicketCommentVO;
@@ -28,6 +35,7 @@ import com.ops.app.vo.TicketHistoryVO;
 import com.ops.app.vo.TicketMVO;
 import com.ops.app.vo.TicketPrioritySLAVO;
 import com.ops.app.vo.TicketVO;
+import com.ops.app.vo.UserIncidentVO;
 import com.ops.jpa.entities.Asset;
 import com.ops.jpa.entities.Company;
 import com.ops.jpa.entities.CustomerSPLinkedTicket;
@@ -120,6 +128,10 @@ public class TicketServiceImpl implements TicketService {
 	@Autowired
 	private FileIntegrationService fileIntegrationService;
 	
+	
+	@Autowired
+	private EntityManager entityManager;
+	
 	@Override
 	public TicketVO saveOrUpdate(final TicketVO customerTicketVO, LoginUser user, SPLoginVO savedLoginVO) throws Exception {
 		LOGGER.info("Inside TicketServiceImpl - saveOrUpdate");
@@ -211,13 +223,13 @@ public class TicketServiceImpl implements TicketService {
 				customerTicketVO.setSla(slaDueDate);
 			}
 			customerTicketVO.setMessage("CREATED");
-			String folderLocation = createIncidentFolder(customerTicketVO.getTicketNumber(), user, null);
+			/*String folderLocation = createIncidentFolder(customerTicketVO.getTicketNumber(), user, null);
 			if(StringUtils.isNotEmpty(folderLocation)){
 				if(!customerTicketVO.getIncidentImageList().isEmpty()){
 					boolean isUploaded = uploadIncidentImages(customerTicketVO, user,null, folderLocation, user.getEmail());
 					customerTicketVO.setFileUploaded(isUploaded);
 				}
-			}
+			}*/
 			
 		}else if(customerTicket.getId()!=null && customerTicket.getModifiedOn()!=null){
 			LOGGER.info("Ticket "+ customerTicket.getTicketNumber() +" updated successfully");
@@ -303,9 +315,26 @@ public class TicketServiceImpl implements TicketService {
 	}
 
 	@Override
-	public List<TicketMVO> getAllCustomerTickets(LoginUser loginUser) throws Exception {
+	public 	List<TicketMVO> getAllCustomerTickets(LoginUser loginUser) throws Exception {
 		LOGGER.info("Inside TicketServiceImpl - getAllCustomerTickets");
+		long startTime = System.nanoTime();
+		Query q = entityManager.createNativeQuery(QueryConstants.INCIDENT_LIST_QUERYY+" = "+loginUser.getUserId(),UserIncidentVO.class);
+		List<UserIncidentVO> userIncidentVOList = q.getResultList();
+		long endTime   = System.nanoTime();
+		long totalTime = endTime - startTime;
+		LOGGER.info("Total Time taken : " + TimeUnit.MILLISECONDS.toSeconds(totalTime));
 		List<TicketMVO> customerTicketList = new ArrayList<TicketMVO>();
+		if(!userIncidentVOList.isEmpty()){
+			for(UserIncidentVO userIncident:userIncidentVOList){
+				TicketMVO tempCustomerTicketVO=getSelectedTicketDetails1(userIncident);
+				customerTicketList.add(tempCustomerTicketVO);
+			}
+		
+		}else{
+			LOGGER.info("No Tickets available");
+			}
+		
+		/*List<TicketMVO> customerTicketList = new ArrayList<TicketMVO>();
 		LOGGER.info("Getting Asset List for logged in user : "+  loginUser.getFirstName() + "" + loginUser.getLastName());
 		List<UserSiteAccess> userSiteAccessList = userSiteAccessRepo.findSiteAssignedFor(loginUser.getUserId());
 		if(userSiteAccessList.isEmpty()){
@@ -319,9 +348,9 @@ public class TicketServiceImpl implements TicketService {
 		List<CustomerTicket> savedCustomerTicketList = customerTicketRepo.findBySiteSiteIdIn(siteIdList);
 		
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
-		if(!savedCustomerTicketList.isEmpty()){
-			for(CustomerTicket customerTicket:savedCustomerTicketList){
-				//TicketVO tempCustomerTicketVO=getSelectedTicketDetails(simpleDateFormat, customerTicket);
+		if(!userIncidentVOList.isEmpty()){
+			for(UserIncidentVO userIncident:userIncidentVOList){
+				//TicketVO tempCustomerTicketVO=getSelectedTicketDetails(userIncident);
 				//tempCustomerTicketVO.setRaisedUser(Long.parseLong(loginUser.getPhoneNo()));
 				TicketMVO tempCustomerTicketVO=getSelectedTicketDetails1(simpleDateFormat, customerTicket);
 				customerTicketList.add(tempCustomerTicketVO);
@@ -330,30 +359,23 @@ public class TicketServiceImpl implements TicketService {
 		}else{
 			LOGGER.info("No Tickets available");
 			}
-		}
+		}*/
 		LOGGER.info("Exit TicketServiceImpl - getAllCustomerTickets");
 		return customerTicketList == null?Collections.EMPTY_LIST:customerTicketList;
 	}
 
-	private TicketMVO getSelectedTicketDetails1(SimpleDateFormat simpleDateFormat, CustomerTicket customerTicket) {
+	private TicketMVO getSelectedTicketDetails1(UserIncidentVO customerTicket) {
 		TicketMVO tempCustomerTicketVO = new TicketMVO();
 		tempCustomerTicketVO.setTicketId(customerTicket.getId());
 		tempCustomerTicketVO.setTicketNumber(customerTicket.getTicketNumber());
 		tempCustomerTicketVO.setTicketTitle(customerTicket.getTicketTitle());
-		
-		tempCustomerTicketVO.setStatusId(customerTicket.getStatus().getStatusId());
-		tempCustomerTicketVO.setStatus(customerTicket.getStatus().getStatus());
-		if(StringUtils.isNotEmpty(customerTicket.getStatus().getDescription())){
+		tempCustomerTicketVO.setRaisedOn(customerTicket.getCreatedOn());
+		tempCustomerTicketVO.setStatusId(customerTicket.getStatusId());
+		tempCustomerTicketVO.setStatus(customerTicket.getStatusName());
+		/*if(StringUtils.isNotEmpty(customerTicket.getStatus().getDescription())){
 			tempCustomerTicketVO.setStatusDescription(customerTicket.getStatus().getDescription());
-			}
-		tempCustomerTicketVO.setRaisedOn(simpleDateFormat.format(customerTicket.getCreatedOn()));
-		tempCustomerTicketVO.setRaisedBy(customerTicket.getCreatedBy());
-	 
-		User user = userDAO.findByEmailId(customerTicket.getCreatedBy());
-		if(user!=null){
-		tempCustomerTicketVO.setCreatedUser(user.getFirstName() +" "+ user.getLastName());
-		}
-		tempCustomerTicketVO.setSla(simpleDateFormat.format(customerTicket.getSlaDuedate()));
+			}*/
+		tempCustomerTicketVO.setSla(customerTicket.getSlaDueDate());
 		return tempCustomerTicketVO;
 	}
 
@@ -1027,6 +1049,29 @@ public class TicketServiceImpl implements TicketService {
 			}
 		return ticketCommentVO;
 	}
+
+	@Override
+	public List<IncidentVO> getUserTickets(LoginUser loginUser) throws Exception {
+		String ejbQl = QueryConstants.INCIDENT_LIST_QUERYY;
+		Query q= entityManager.createNativeQuery(ejbQl);
+		q.setParameter("userId", loginUser.getUserId());
+		List<Object[]> incidentList =  q.getResultList();
+		List<IncidentVO> incidentVOList = new ArrayList<IncidentVO>();
+		for (Object[] result : incidentList) {
+			IncidentVO incidentVO = new IncidentVO();
+			incidentVO.setTicketId(Long.parseLong(result[0].toString()));
+			incidentVO.setTicketNumber(result[1].toString());
+			incidentVO.setTicketTitle(result[2].toString());
+			incidentVO.setStatusId(result[3].toString());
+			incidentVO.setStatus(result[4].toString());
+			incidentVO.setPriority(result[5].toString());
+			incidentVO.setCreatedOn(result[6].toString());
+			incidentVO.setSlaDueDate(result[7].toString());
+			incidentVOList.add(incidentVO);
+		}		
+		return incidentVOList==null?Collections.emptyList():incidentVOList;
+	}
+
 
 	
 }

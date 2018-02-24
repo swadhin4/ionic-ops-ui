@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ops.app.vo.CustomerSPLinkedTicketVO;
 import com.ops.app.vo.CustomerTicketVO;
+import com.ops.app.vo.IncidentVO;
 import com.ops.app.vo.LoginUser;
 import com.ops.app.vo.SPLoginVO;
 import com.ops.app.vo.TicketCommentVO;
@@ -62,5 +63,7 @@ public interface TicketService {
 	public CustomerSPLinkedTicketVO saveSPLinkedTicket(Long custTicket, String custTicketNumber, String linkedTicket, String spEmail) throws Exception;
 
 	public TicketCommentVO saveSPTicketComment(TicketCommentVO ticketCommentVO, SPLoginVO savedLoginVO) throws Exception;
+	
+	public List<IncidentVO> getUserTickets(LoginUser loginUser) throws Exception;
 
 }

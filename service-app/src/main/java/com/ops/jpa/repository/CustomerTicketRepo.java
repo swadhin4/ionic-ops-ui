@@ -26,4 +26,5 @@ public interface CustomerTicketRepo extends JpaRepository<CustomerTicket, Long> 
 	public List<CustomerTicket> findByAssignedTo(ServiceProvider serviceProvider); 
 
 
+	
 }

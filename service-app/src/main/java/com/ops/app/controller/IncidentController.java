@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.ops.app.util.RestResponse;
 import com.ops.app.vo.CustomerSPLinkedTicketVO;
 import com.ops.app.vo.EscalationLevelVO;
+import com.ops.app.vo.IncidentVO;
 import com.ops.app.vo.LoginUser;
 import com.ops.app.vo.ServiceProviderVO;
 import com.ops.app.vo.TicketCommentVO;
@@ -33,6 +34,7 @@ import com.ops.app.vo.TicketHistoryVO;
 import com.ops.app.vo.TicketMVO;
 import com.ops.app.vo.TicketPrioritySLAVO;
 import com.ops.app.vo.TicketVO;
+import com.ops.app.vo.UserIncidentVO;
 import com.ops.app.vo.UserVO;
 import com.ops.jpa.entities.SPEscalationLevels;
 import com.ops.jpa.entities.Status;
@@ -82,7 +84,7 @@ public class IncidentController  {
 
 	@RequestMapping(value = "/v1/list", method = RequestMethod.GET,produces="application/json")
 	public ResponseEntity<RestResponse> listAllTickets(@RequestParam("email") String email) {
-		List<TicketMVO> tickets = null;
+		List<IncidentVO> tickets = null;
 		RestResponse response = new RestResponse();
 		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
 		try {
@@ -93,7 +95,7 @@ public class IncidentController  {
 				authorizedUser.setFirstName(user.getFirstName());
 				authorizedUser.setLastName(user.getLastName());
 				authorizedUser.setUserId(user.getUserId());
-				tickets = ticketService.getAllCustomerTickets(authorizedUser);
+				tickets = ticketService.getUserTickets(authorizedUser);
 				if (tickets.isEmpty()) {
 					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NO_CONTENT);
 					return responseEntity;
@@ -460,6 +462,81 @@ public class IncidentController  {
 		}
 		
 		logger.info("Exit IncidentController .. escalate");
+		return responseEntity;
+	}
+	
+	
+	@RequestMapping(value = "/v1/create", method = RequestMethod.POST, produces = "application/json")
+	public ResponseEntity<RestResponse> createNewIncident(@RequestBody final TicketVO ticketVO) {
+		logger.info("Inside IncidentController .. createNewIncident");
+		RestResponse response = new RestResponse();
+		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
+		
+		TicketVO savedTicketVO = null;
+		RestResponse emailResponse =null;
+		User user = userService.findByEmail(ticketVO.getCreatedBy());
+		if(user!=null){
+			LoginUser loginUser = new LoginUser();
+			loginUser.setUserId(user.getUserId());
+			loginUser.setUsername(user.getEmailId());
+			
+			try {
+				logger.info("TicektVO : "+ ticketVO);
+				savedTicketVO = ticketService.saveOrUpdate(ticketVO, loginUser, null);
+				if(savedTicketVO.getTicketId()!= null && savedTicketVO.getMessage().equalsIgnoreCase("CREATED")){
+					response.setStatusCode(200);
+					response.setObject(savedTicketVO);
+					response.setMessage("New Incident created successfully");
+					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
+					/*List<TicketAttachment> fileAttachmentList = getIncidentAttachments(ticketVO.getTicketNumber());
+					if(!fileAttachmentList.isEmpty()){
+					savedTicketVO.setAttachments(fileAttachmentList);
+					}*/
+			
+				}/*else if(savedTicketVO.getTicketId()!= null && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
+					response.setStatusCode(200);
+					List<TicketAttachment> fileAttachmentList = getIncidentAttachments(ticketVO.getTicketNumber());
+					if(!fileAttachmentList.isEmpty()){
+						savedTicketVO.setAttachments(fileAttachmentList);
+						}
+					response.setObject(savedTicketVO);
+					response.setMessage("Incident updated successfully");
+					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
+				}*/
+
+			} catch (Exception e) {
+				logger.info("Exception in getting response", e);
+				response.setMessage("Exception while creating an incident");
+				response.setStatusCode(500);
+				responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			
+			/*if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("CREATED")){
+				try {
+					  emailService.successTicketCreationSPEmail(savedTicketVO, "CREATED", loginUser.getCompany().getCompanyName());
+				 } catch (Exception e) {
+					 logger.info("Exception in sending incident creation mail", e);
+				}
+
+
+			}*//*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
+
+			}
+			/*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
+
+
+			}
+			/*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
+
+				try {
+					 emailResponse = emailService.successTicketCreationSPEmail(savedTicketVO, "UPDATED");
+				 } catch (Exception e) {
+					 logger.info("Exception in sending incident update mail", e);
+				}
+			}*/
+		}
+
+		logger.info("Exit IncidentController .. createNewIncident");
 		return responseEntity;
 	}
 	

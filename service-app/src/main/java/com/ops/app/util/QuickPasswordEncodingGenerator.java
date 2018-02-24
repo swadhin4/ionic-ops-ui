@@ -13,8 +13,8 @@ public class QuickPasswordEncodingGenerator {
 		return passwordEncoder.encode(rawPassword);
 	}
 
-/*	public static void main(String[] args){
-		System.out.println(encodePassword("siba"));
-	}*/
-
+	/*public static void main(String[] args){
+		System.out.println(encodePassword("mkp006"));
+	}
+*/
 }

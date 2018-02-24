@@ -90,7 +90,7 @@ public class User implements Serializable {
 	private List<UserRole> userRoles=new ArrayList<UserRole>();
 
 
-	@OneToMany(mappedBy="user", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy="user", fetch = FetchType.LAZY)
 	private List<UserSiteAccess> userAccessList = new ArrayList<UserSiteAccess>(0);
 
 	public User() {

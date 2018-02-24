@@ -112,16 +112,16 @@ public class Site implements Serializable{
 	@Column(name="site_number2")
 	private Long siteNumberTwo;
 
-	@OneToMany(fetch=FetchType.EAGER, mappedBy="site",cascade=CascadeType.ALL)
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="site",cascade=CascadeType.ALL)
 	private List<SiteLicence> siteLicences;
 
-	@OneToMany(fetch=FetchType.EAGER, mappedBy="site",cascade=CascadeType.ALL)
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="site",cascade=CascadeType.ALL)
 	private List<SiteDeliveryOperation> siteDeliveryOpetaionTimes;
 
-	@OneToMany(fetch=FetchType.EAGER, mappedBy="site",cascade=CascadeType.ALL)
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="site",cascade=CascadeType.ALL)
 	private List<SiteSalesOperation> siteSalesOpetaionTimes;
 
-	@OneToMany(fetch=FetchType.EAGER, mappedBy="site",cascade=CascadeType.ALL)
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="site",cascade=CascadeType.ALL)
 	private List<SiteSubMeter> siteSubmeterList;
 
 	@OneToMany(mappedBy="site", fetch = FetchType.LAZY)

@@ -54,15 +54,15 @@ public class CustomerTicket implements Serializable {
 	private Status status;
 
 
-	@OneToOne(fetch=FetchType.EAGER)
+	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="ticket_category")
 	private TicketCategory ticketCategory;
 
-	@OneToOne(fetch=FetchType.EAGER)
+	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="site_id")
 	private Site site;
 
-	@OneToOne(fetch=FetchType.EAGER)
+	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="asset_id")
 	private Asset asset;
 
@@ -79,7 +79,7 @@ public class CustomerTicket implements Serializable {
 	@Column(name="close_note")
 	private String closeNote;
 
-	@OneToOne(fetch=FetchType.EAGER)
+	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="assigned_to")
 	private ServiceProvider assignedTo;
 
@@ -236,15 +236,9 @@ public class CustomerTicket implements Serializable {
 	public String getPriority() {
 		return priority;
 	}
-
-
-
 	public void setPriority(final String priority) {
 		this.priority = priority;
 	}
-
-
-
 	public Date getSlaDuedate() {
 		return slaDuedate;
 	}
