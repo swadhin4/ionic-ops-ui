@@ -6,7 +6,6 @@ package com.ops.app.controller;
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ops.app.util.RestResponse;
 import com.ops.app.vo.AssetVO;
-import com.ops.app.vo.LoginUser;
 import com.ops.jpa.entities.AssetCategory;
 import com.ops.jpa.entities.AssetLocation;
 import com.ops.web.service.ApplicationService;

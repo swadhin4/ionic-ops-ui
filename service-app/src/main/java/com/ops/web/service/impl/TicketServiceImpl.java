@@ -8,7 +8,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
 import com.ops.app.constants.QueryConstants;
 import com.ops.app.util.RandomUtils;
 import com.ops.app.vo.CustomerSPLinkedTicketVO;
@@ -51,7 +49,6 @@ import com.ops.jpa.entities.TicketHistory;
 import com.ops.jpa.entities.TicketPriority;
 import com.ops.jpa.entities.TicketPrioritySettings;
 import com.ops.jpa.entities.User;
-import com.ops.jpa.entities.UserSiteAccess;
 import com.ops.jpa.repository.AssetRepo;
 import com.ops.jpa.repository.CustomerSPLinkedTicketRepo;
 import com.ops.jpa.repository.CustomerTicketRepo;

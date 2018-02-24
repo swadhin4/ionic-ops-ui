@@ -5,7 +5,6 @@ package com.ops.app.controller;
 
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ops.app.util.RestResponse;
 import com.ops.app.vo.CreateSiteVO;
-import com.ops.app.vo.LoginUser;
 import com.ops.web.service.SiteService;
 
 /**

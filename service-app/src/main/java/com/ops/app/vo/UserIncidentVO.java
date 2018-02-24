@@ -1,8 +1,5 @@
 package com.ops.app.vo;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 public class UserIncidentVO {
 
 	private Long id;
